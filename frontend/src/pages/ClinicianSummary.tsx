@@ -1,16 +1,23 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import type {  FollowUpSummary  } from '../types';
 import { getFollowUpSummary } from '../services/summaryService';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { AlertTriangle, ActivitySquare, FileText, CheckCircle2 } from 'lucide-react';
 
+import { getAuthUser } from '../services/api';
+
 export const ClinicianSummary: React.FC = () => {
   const [summary, setSummary] = useState<FollowUpSummary | null>(null);
   const [generating, setGenerating] = useState(false);
 
-  useEffect(() => { getFollowUpSummary().then(setSummary); }, []);
+  useEffect(() => {
+    const user = getAuthUser();
+    if (user?.id) {
+      getFollowUpSummary(user.id).then(setSummary).catch(console.error);
+    }
+  }, []);
 
   const handleGenerate = () => {
     setGenerating(true);

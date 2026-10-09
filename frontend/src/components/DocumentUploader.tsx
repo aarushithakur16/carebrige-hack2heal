@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { UploadCloud } from 'lucide-react';
 import { Button } from './Button';
 import { DocumentCard } from './DocumentCard';

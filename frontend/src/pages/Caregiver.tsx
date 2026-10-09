@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card } from '../components/Card';
 import { Users, Bell, MessageSquare, ShieldCheck } from 'lucide-react';
 import { Button } from '../components/Button';

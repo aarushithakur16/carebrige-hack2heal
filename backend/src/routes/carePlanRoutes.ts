@@ -1,63 +1,65 @@
-import { Router, Request, Response } from 'express';
-import { query } from '../db';
+import { Router, Request, Response, NextFunction } from 'express';
+import { query } from '../config/database';
+import { authenticateToken, authorizeRoles, verifyPatientConsentForCaregiver } from '../middleware/authMiddleware';
+import { logAudit } from '../utils/auditLogger';
 
-const router = Router({ mergeParams: true });
+const router = Router();
 
-// Mock Authentication Middleware
-const mockAuthAndOwnership = (req: Request, res: Response, next: Function) => {
-  const requestUserId = req.headers['x-patient-id'];
-  const targetPatientId = req.params.id; // from /patients/:id/...
-
-  if (!requestUserId) {
-    return res.status(401).json({ error: 'Authentication failed. Missing x-patient-id header.' });
-  }
-
-  // Enforce patient privacy: a patient can only request their own care plan
-  if (requestUserId !== targetPatientId) {
-    return res.status(403).json({ error: 'Forbidden. You do not have permission to view another patient\'s care plan.' });
-  }
-
-  next();
-};
-
-router.get('/care-plan', mockAuthAndOwnership, async (req: Request, res: Response) => {
+// GET /patients/:id/care-plan
+router.get('/:id/care-plan', authenticateToken, authorizeRoles('PATIENT', 'CAREGIVER', 'CLINICIAN'), verifyPatientConsentForCaregiver, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const patientId = req.params.id;
+    const userId = (req as any).user?.id;
 
-    // Retrieve ALL verified care plans for the patient from the db
-    const cpResult = await query('SELECT * FROM care_plans WHERE patient_id = $1', [patientId]);
-    
-    if (cpResult.rowCount === 0) {
-      return res.status(200).json({
-        medications: [],
-        appointments: [],
-        tests: [],
-        care_tasks: [],
-        message: 'No active care plan found.'
-      });
+    if ((req as any).user?.role === 'PATIENT' && patientId !== userId) {
+      return res.status(403).json({ error: 'Cannot access another patient\'s care plan.' });
     }
 
-    // Since a patient might have multiple care plan inserts over time, we consolidate them
-    // (In a real production app, this would be handled via a unified single row or state machine)
-    const activeCarePlan = {
-      medications: [] as any[],
-      appointments: [] as any[],
-      tests: [] as any[],
-      care_tasks: [] as any[]
+    const meds = await query('SELECT * FROM medications WHERE patient_id = $1 AND verified = true', [patientId]);
+    const appts = await query('SELECT * FROM appointments WHERE patient_id = $1', [patientId]);
+    const tests = await query('SELECT * FROM tests WHERE patient_id = $1', [patientId]);
+    const tasks = await query('SELECT * FROM care_tasks WHERE patient_id = $1', [patientId]);
+
+    await logAudit(userId, 'ACCESS_CARE_PLAN', `Patient ${patientId}`);
+
+    return res.status(200).json({
+      medications: meds.rows,
+      appointments: appts.rows,
+      tests: tests.rows,
+      care_tasks: tasks.rows
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /patients/:id/follow-up-summary
+router.get('/:id/follow-up-summary', authenticateToken, authorizeRoles('CLINICIAN'), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const patientId = req.params.id;
+    const userId = (req as any).user?.id;
+
+    // Build the concise summary manually without diagnosing
+    const meds = await query('SELECT * FROM medications WHERE patient_id = $1', [patientId]);
+    const tasks = await query('SELECT * FROM care_tasks WHERE patient_id = $1', [patientId]);
+    const appts = await query('SELECT * FROM appointments WHERE patient_id = $1', [patientId]);
+    const checkins = await query('SELECT * FROM checkins WHERE patient_id = $1 ORDER BY timestamp DESC LIMIT 10', [patientId]);
+
+    const summary = {
+      patientInformation: `Patient ID: ${patientId}`,
+      medicationAdherence: meds.rows,
+      completedTasks: tasks.rows.filter(t => t.status === 'COMPLETED'),
+      missedTasks: tasks.rows.filter(t => t.status === 'MISSED'),
+      delayedTasks: tasks.rows.filter(t => t.status === 'DELAYED'),
+      upcomingAppointments: appts.rows,
+      patientEnteredNotes: checkins.rows.map(c => c.note).filter(Boolean)
     };
 
-    for (const row of cpResult.rows) {
-      activeCarePlan.medications.push(...(typeof row.medications === 'string' ? JSON.parse(row.medications) : row.medications || []));
-      activeCarePlan.appointments.push(...(typeof row.appointments === 'string' ? JSON.parse(row.appointments) : row.appointments || []));
-      activeCarePlan.tests.push(...(typeof row.tests === 'string' ? JSON.parse(row.tests) : row.tests || []));
-      activeCarePlan.care_tasks.push(...(typeof row.care_tasks === 'string' ? JSON.parse(row.care_tasks) : row.care_tasks || []));
-    }
+    await logAudit(userId, 'ACCESS_CLINICIAN_SUMMARY', `Patient ${patientId}`);
 
-    return res.status(200).json(activeCarePlan);
-
-  } catch (error: any) {
-    console.error('Care Plan error:', error);
-    return res.status(500).json({ error: 'Failed to retrieve care plan.' });
+    return res.status(200).json(summary);
+  } catch (error) {
+    next(error);
   }
 });
 

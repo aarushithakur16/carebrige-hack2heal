@@ -1,20 +1,23 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ActivitySquare, User, Mail, Phone, Lock } from 'lucide-react';
 import { Button } from '../components/Button';
 
+import { register } from '../services/authService';
+
 export const Register: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: '', email: '', phone: '', password: '', confirm: '', role: 'Patient'
+    name: '', email: '', phone: '', password: '', confirm: '', role: 'PATIENT'
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({...formData, [e.target.name]: e.target.value});
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.password || !formData.confirm) {
       setError('Please fill in all required fields');
@@ -25,9 +28,16 @@ export const Register: React.FC = () => {
       return;
     }
     
-    // Mock Authentication
-    localStorage.setItem('cb_auth', JSON.stringify({ email: formData.email, role: formData.role.toLowerCase() }));
-    navigate('/dashboard');
+    setLoading(true);
+    try {
+      // Backend expects role to be uppercase like 'PATIENT'
+      await register(formData.name, formData.email, formData.password, formData.role.toUpperCase());
+      navigate('/login');
+    } catch (err: any) {
+      setError(err.message || 'Registration failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -97,7 +107,9 @@ export const Register: React.FC = () => {
             </div>
           </div>
           
-          <Button type="submit" className="w-full mt-4 py-3">Create Account</Button>
+          <Button type="submit" className="w-full mt-4 py-3" disabled={loading}>
+            {loading ? 'Creating Account...' : 'Create Account'}
+          </Button>
         </form>
         
         <div className="mt-6 text-center text-sm text-muted">

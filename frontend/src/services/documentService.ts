@@ -1,7 +1,24 @@
+import { apiFetch } from './api';
 
-import type {  Document  } from '../types';
-import { mockDocuments } from '../data/documents';
-export const getDocuments = async (): Promise<Document[]> => { return [...mockDocuments]; };
-export const uploadDocument = async (file: File): Promise<Document> => {
-  return new Promise(resolve => setTimeout(() => resolve({ id: Date.now().toString(), name: file.name, type: file.type, size: file.size, status: 'Extraction Ready', uploadedAt: new Date().toISOString() }), 1500));
+export const uploadDocument = async (file: File): Promise<any> => {
+  const formData = new FormData();
+  formData.append('document', file);
+  
+  return await apiFetch('/documents/upload', {
+    method: 'POST',
+    body: formData,
+  });
+};
+
+export const extractDocument = async (documentId: string): Promise<any> => {
+  return await apiFetch(`/documents/${documentId}/extract`, {
+    method: 'POST',
+  });
+};
+
+export const verifyExtraction = async (documentId: string, verifiedData: any, status: 'confirmed' | 'rejected'): Promise<any> => {
+  return await apiFetch(`/documents/${documentId}/verify`, {
+    method: 'POST',
+    body: JSON.stringify({ verifiedData, status }),
+  });
 };

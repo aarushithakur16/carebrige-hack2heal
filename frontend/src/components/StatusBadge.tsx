@@ -1,4 +1,3 @@
-import React from 'react';
 
 interface StatusBadgeProps {
   status: 'critical' | 'stable' | 'warning' | 'info' | 'success';

@@ -1,6 +1,5 @@
+import { apiFetch } from './api';
 
-import type {  FollowUpSummary  } from '../types';
-import { mockSummary } from '../data/summary';
-export const getFollowUpSummary = async (): Promise<FollowUpSummary> => {
-  return new Promise(resolve => setTimeout(() => resolve({ ...mockSummary }), 800));
+export const getFollowUpSummary = async (patientId: string): Promise<any> => {
+  return await apiFetch(`/patients/${patientId}/follow-up-summary`);
 };

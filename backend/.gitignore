@@ -1,6 +1,5 @@
 node_modules/
 dist/
-dist-ssr/
 *.local
 .env
 .env.*
@@ -8,3 +7,4 @@ dist-ssr/
 .DS_Store
 uploads/
 *.log
+coverage/

@@ -1,4 +1,14 @@
+import { apiFetch, getAuthUser } from './api';
+import type { Appointment, Test } from '../types';
 
-import type {  Appointment  } from '../types';
-import { mockAppointments } from '../data/appointments';
-export const getAppointments = async (): Promise<Appointment[]> => { return [...mockAppointments]; };
+export const getAppointments = async (): Promise<Appointment[]> => {
+  const user = getAuthUser();
+  if (!user) return [];
+  return await apiFetch(`/appointments?patientId=${user.id}`);
+};
+
+export const getTests = async (): Promise<Test[]> => {
+  const user = getAuthUser();
+  if (!user) return [];
+  return await apiFetch(`/tests?patientId=${user.id}`);
+};

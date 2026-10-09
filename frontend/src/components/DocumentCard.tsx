@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card } from './Card';
 import { FileText, Image, Trash2 } from 'lucide-react';
 import { UploadProgress } from './UploadProgress';

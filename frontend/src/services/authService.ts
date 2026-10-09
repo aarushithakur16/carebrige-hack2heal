@@ -1,5 +1,15 @@
+import { apiFetch } from './api';
 
-import type {  User  } from '../types';
-export const login = async (email: string, role: 'patient'|'caregiver'|'clinician'): Promise<User> => {
-  return new Promise(resolve => setTimeout(() => resolve({ id: 'u1', email, role, name: 'Demo User' }), 500));
+export const login = async (email: string, password: string): Promise<any> => {
+  return await apiFetch('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password }),
+  });
+};
+
+export const register = async (name: string, email: string, password: string, role: string): Promise<any> => {
+  return await apiFetch('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify({ name, email, password, role }),
+  });
 };

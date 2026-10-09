@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { Card } from '../components/Card';
 import { StatusBadge } from '../components/StatusBadge';
 import { 
@@ -30,6 +30,8 @@ import {
 } from 'recharts';
 
 export const Dashboard: React.FC = () => {
+  const [todayString] = useState(() => new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }));
+
   return (
     <div className="dashboard-container space-y-6">
       {/* Welcome Section */}
@@ -40,7 +42,7 @@ export const Dashboard: React.FC = () => {
         </div>
         <div className="hidden md:block text-right">
           <p className="text-sm text-muted">Today's Date</p>
-          <p className="font-semibold">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+          <p className="font-semibold">{todayString}</p>
         </div>
       </div>
 

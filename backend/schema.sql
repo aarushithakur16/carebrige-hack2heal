@@ -20,7 +20,10 @@ CREATE TABLE documents (
   patient_id UUID REFERENCES patients(id) ON DELETE CASCADE,
   file_path VARCHAR(500) NOT NULL,
   upload_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  document_type VARCHAR(100)
+  document_type VARCHAR(100),
+  status VARCHAR(50) DEFAULT 'uploaded',
+  draft_extraction JSONB,
+  verified_extraction JSONB
 );
 
 CREATE TABLE medications (

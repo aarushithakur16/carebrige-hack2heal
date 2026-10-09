@@ -1,24 +1,34 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ActivitySquare, Lock, Mail } from 'lucide-react';
 import { Button } from '../components/Button';
+
+import { login } from '../services/authService';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
       setError('Please fill in all fields');
       return;
     }
     
-    // Mock Authentication
-    localStorage.setItem('cb_auth', JSON.stringify({ email, role: 'patient' }));
-    navigate('/dashboard');
+    setLoading(true);
+    try {
+      const response = await login(email, password);
+      localStorage.setItem('cb_auth', JSON.stringify({ token: response.token, user: response.user }));
+      navigate('/dashboard');
+    } catch (err: any) {
+      setError(err.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -71,7 +81,9 @@ export const Login: React.FC = () => {
             <label htmlFor="remember" className="text-sm text-muted">Remember me for 30 days</label>
           </div>
           
-          <Button type="submit" className="w-full mt-4 py-3">Sign In</Button>
+          <Button type="submit" className="w-full mt-4 py-3" disabled={loading}>
+            {loading ? 'Signing in...' : 'Sign In'}
+          </Button>
         </form>
         
         <div className="mt-6 text-center text-sm text-muted">

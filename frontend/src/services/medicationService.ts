@@ -1,5 +1,16 @@
+import { apiFetch, getAuthUser } from './api';
+import type { Medication } from '../types';
 
-import type {  Medication  } from '../types';
-import { mockMedications } from '../data/medications';
-export const getMedications = async (): Promise<Medication[]> => { return [...mockMedications]; };
-export const updateMedicationStatus = async (id: string, status: Medication['status']): Promise<void> => { console.log('Mock updated med', id, status); };
+export const getMedications = async (): Promise<Medication[]> => {
+  const user = getAuthUser();
+  if (!user) return [];
+  const res = await apiFetch(`/patients/${user.id}/care-plan`);
+  return res.medications || [];
+};
+
+export const updateMedicationStatus = async (medId: string, status: string): Promise<Medication> => {
+  return await apiFetch(`/medications/${medId}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status }),
+  });
+};

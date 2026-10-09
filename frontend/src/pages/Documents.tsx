@@ -1,4 +1,3 @@
-import React from 'react';
 import { DocumentUploader } from '../components/DocumentUploader';
 
 export const Documents: React.FC = () => {
