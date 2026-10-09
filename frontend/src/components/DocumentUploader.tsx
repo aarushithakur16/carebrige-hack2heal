@@ -136,8 +136,11 @@ export const DocumentUploader: React.FC = () => {
           )}
           
           {uploadStatus === 'Extraction Ready' && (
-            <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-400 mt-4 text-center">
-              Mock OCR extraction complete. Data is ready for review.
+            <div className="flex flex-col items-center p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-400 mt-4 text-center space-y-4">
+              <p>Mock OCR extraction complete. Data is ready for review.</p>
+              <Button onClick={() => window.location.href = '/verification'}>
+                Review & Verify Data
+              </Button>
             </div>
           )}
         </div>
