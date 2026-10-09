@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { query } from '../db';
 import { processDocumentOCR } from '../services/ocrService';
-import { extractMedicalData } from '../services/extractionService';
+import { authenticateToken, authorizeRoles, verifyPatientConsentForCaregiver } from '../middleware/authMiddleware';
 
 const router = Router();
 
@@ -24,8 +24,8 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ 
-  storage,
   limits: { fileSize: 10 * 1024 * 1024 },
+  storage,
   fileFilter: (req, file, cb) => {
     const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
     if (allowedTypes.includes(file.mimetype)) cb(null, true);
@@ -33,23 +33,13 @@ const upload = multer({
   }
 });
 
-// Mock Authentication & Ownership Middleware
-const mockAuthAndOwnership = (req: Request, res: Response, next: Function) => {
-  const patientId = req.body.patientId || req.headers['x-patient-id'];
-  if (!patientId) {
-    return res.status(401).json({ error: 'Authentication failed. Missing patient ID.' });
-  }
-  req.user = { id: patientId }; 
-  next();
-};
-
-// 1. Upload Document
-router.post('/upload', mockAuthAndOwnership, upload.single('document'), async (req: Request, res: Response) => {
+// 1. Upload Document (Patient or Clinician only)
+router.post('/upload', authenticateToken, authorizeRoles('PATIENT', 'CLINICIAN'), upload.single('document'), async (req: Request, res: Response) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
 
     const documentId = `doc_${Date.now()}`;
-    const patientId = req.user?.id;
+    const patientId = req.body.patientId || req.user?.id; // If clinician, they pass patientId in body
     const documentType = req.body.documentType || 'unknown';
     const filePath = req.file.path;
     const uploadTime = new Date().toISOString();

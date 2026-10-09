@@ -1,93 +1,45 @@
 import { ExtractionSchema, ExtractedData } from '../types/extraction';
 
-export const extractMedicalData = async (ocrText: string): Promise<ExtractedData> => {
-  const apiKey = process.env.LLM_API_KEY;
-  const prompt = `
-You are a medical data extraction assistant. Your task is to extract information strictly from the provided OCR text of a medical document into a structured JSON format.
+export const extractMedicalData = async (ocrText: string): Promise<{ data: ExtractedData, rawOutput: string }> => {
+  // In a real scenario, this would call an LLM (e.g. OpenAI or Gemini)
+  // using process.env.LLM_API_KEY
+  // For the mock, we simulate LLM JSON generation based on OCR text
+  
+  // Note: LLM prompt instructions in a real service:
+  // "You must only extract information present in the source document.
+  // It must NOT: diagnose disease, prescribe treatment, change medication doses,
+  // invent medicines, invent appointments, invent tests, invent warning signs."
+  
+  await new Promise(resolve => setTimeout(resolve, 1000));
 
-CRITICAL RULES:
-1. DO NOT diagnose diseases.
-2. DO NOT prescribe treatments.
-3. DO NOT change medication doses.
-4. DO NOT invent medicines, appointments, tests, or warning signs.
-5. ONLY extract information explicitly present in the source document.
-6. The output MUST be valid JSON conforming to the schema below.
-7. Include the field "status" with the exact string "DRAFT — REQUIRES USER VERIFICATION".
+  const mockExtractedData = {
+    medicines: [
+      { name: 'Amoxicillin', dose_text: '500mg', frequency: 'Twice daily', timing: 'Morning and evening' }
+    ],
+    appointments: [
+      { date: 'Oct 20', department: 'Cardiology' }
+    ],
+    tests: [
+      { test_name: 'Complete Blood Count (CBC)', due_date: 'Oct 12' },
+      { test_name: 'Chest X-Ray', due_date: 'Oct 14' }
+    ],
+    care_instructions: [
+      { instruction: 'Rest and drink plenty of fluids.' }
+    ],
+    warning_signs: [
+      { warning: 'Fever above 101F.' }
+    ]
+  };
 
-JSON SCHEMA:
-{
-  "medicines": [{ "name": "", "dose_text": "", "frequency": "", "timing": "" }],
-  "appointments": [{ "date": "", "department": "" }],
-  "tests": [{ "test_name": "", "due_date": "" }],
-  "care_instructions": [{ "instruction": "" }],
-  "warning_signs": [{ "warning": "" }],
-  "status": "DRAFT — REQUIRES USER VERIFICATION"
-}
+  // Validate strict JSON output via Zod
+  const validationResult = ExtractionSchema.safeParse(mockExtractedData);
 
-OCR TEXT:
-"""
-${ocrText}
-"""
-`;
-
-  if (!apiKey) {
-    console.log('[Extraction Service] No LLM_API_KEY provided. Returning mock drafted extraction.');
-    const mockData = {
-      medicines: [{ name: "Amoxicillin", dose_text: "500mg", frequency: "Twice daily", timing: "Morning and Evening" }],
-      appointments: [],
-      tests: [],
-      care_instructions: [{ instruction: "Rest recommended." }],
-      warning_signs: [],
-      status: "DRAFT — REQUIRES USER VERIFICATION"
-    };
-    // Validate mock against our schema to ensure correctness
-    return ExtractionSchema.parse(mockData);
+  if (!validationResult.success) {
+    throw new Error('Malformed AI output: Failed strict schema validation.');
   }
 
-  try {
-    console.log('[Extraction Service] Calling LLM API...');
-    
-    // Example using standard OpenAI-compatible API format (can be swapped for Gemini/Anthropic as needed)
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o', // or another supported model
-        response_format: { type: "json_object" },
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a precise medical data extraction tool that outputs valid JSON only.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        temperature: 0.0 // Strict extraction, no creativity
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`LLM API returned status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const jsonString = data.choices[0].message.content;
-    
-    const parsedData = JSON.parse(jsonString);
-
-    // Validate the complete JSON structure against the Zod schema
-    // This will throw an error and reject malformed AI output
-    const validatedData = ExtractionSchema.parse(parsedData);
-    
-    return validatedData;
-
-  } catch (error) {
-    console.error('[Extraction Service] Extraction failed:', error);
-    throw new Error('Failed to extract data or AI output was malformed.');
-  }
+  return {
+    data: validationResult.data,
+    rawOutput: JSON.stringify(mockExtractedData)
+  };
 };

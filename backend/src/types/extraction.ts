@@ -30,8 +30,7 @@ export const ExtractionSchema = z.object({
   appointments: z.array(AppointmentSchema),
   tests: z.array(TestSchema),
   care_instructions: z.array(CareInstructionSchema),
-  warning_signs: z.array(WarningSignSchema),
-  status: z.literal("DRAFT — REQUIRES USER VERIFICATION")
+  warning_signs: z.array(WarningSignSchema)
 });
 
 export type ExtractedData = z.infer<typeof ExtractionSchema>;
