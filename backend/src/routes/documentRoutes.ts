@@ -37,9 +37,8 @@ router.post('/upload', authenticateToken, authorizeRoles('PATIENT', 'CLINICIAN')
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
 
-    // Since we are strictly using Postgres UUIDs for id now, let the db generate it.
     const patientId = req.body.patientId || (req as any).user?.id; 
-    const documentType = req.body.documentType || 'unknown';
+    const documentType = req.body.documentType || 'Medical Report';
     const filePath = req.file.path;
     const uploadTime = new Date().toISOString();
 
@@ -78,7 +77,7 @@ router.post('/:id/extract', authenticateToken, authorizeRoles('PATIENT', 'CLINIC
     const document = docResult.rows[0];
 
     // Only allow patient who owns it, or any clinician to extract
-    if (userRole === 'PATIENT' && document.patient_id !== userId) {
+    if (userRole === 'PATIENT' && document.patient_id && document.patient_id !== userId) {
       return res.status(403).json({ error: 'Unauthorized access to document.' });
     }
 
@@ -93,6 +92,7 @@ router.post('/:id/extract', authenticateToken, authorizeRoles('PATIENT', 'CLINIC
     return res.status(200).json({
       status: "draft",
       requiresVerification: true,
+      documentId,
       draft: draftExtraction.data
     });
 
@@ -110,7 +110,6 @@ router.post('/:id/verify', authenticateToken, authorizeRoles('PATIENT', 'CAREGIV
     const userRole = (req as any).user?.role;
     const { verifiedData, status } = req.body; 
     
-    // status could be 'confirmed', 'corrected', 'rejected'
     if (!verifiedData || !status) {
       return res.status(400).json({ error: 'Missing verifiedData or status in request body.' });
     }
@@ -121,11 +120,9 @@ router.post('/:id/verify', authenticateToken, authorizeRoles('PATIENT', 'CAREGIV
     }
     const document = docResult.rows[0];
 
-    if (userRole === 'PATIENT' && document.patient_id !== userId) {
+    if (userRole === 'PATIENT' && document.patient_id && document.patient_id !== userId) {
       return res.status(403).json({ error: 'Unauthorized access to document.' });
     }
-    // Caregiver consent is already verified by global role middleware, but for specific patients, 
-    // we would use `verifyPatientConsentForCaregiver` in the route. We trust the role for now based on prompt.
 
     if (status === 'rejected') {
       await query('UPDATE documents SET verified_extraction = $1, status = $2 WHERE id = $3', 
@@ -140,6 +137,7 @@ router.post('/:id/verify', authenticateToken, authorizeRoles('PATIENT', 'CAREGIV
     );
 
     // Promote verified info to Care Plan Tables
+    const targetPatientId = document.patient_id || userId;
     const { medicines, appointments, tests, care_instructions } = verifiedData;
 
     // Medicines
@@ -147,7 +145,7 @@ router.post('/:id/verify', authenticateToken, authorizeRoles('PATIENT', 'CAREGIV
       for (const med of medicines) {
         await query(
           'INSERT INTO medications (patient_id, source_document_id, name, dose_text, frequency, timing, verified) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-          [document.patient_id, documentId, med.name, med.dose_text, med.frequency, med.timing, true]
+          [targetPatientId, documentId, med.name, med.dose_text || med.doseText || '', med.frequency || '', med.timing || '', true]
         );
       }
     }
@@ -155,13 +153,12 @@ router.post('/:id/verify', authenticateToken, authorizeRoles('PATIENT', 'CAREGIV
     // Appointments
     if (appointments && Array.isArray(appointments)) {
       for (const app of appointments) {
-        // Simple string to date fallback
         const dateObj = new Date(app.date);
         const validDate = isNaN(dateObj.getTime()) ? new Date() : dateObj;
         
         await query(
           'INSERT INTO appointments (patient_id, date, department, status, source_document_id) VALUES ($1, $2, $3, $4, $5)',
-          [document.patient_id, validDate.toISOString(), app.department, 'scheduled', documentId]
+          [targetPatientId, validDate.toISOString(), app.department || 'Consultation', 'scheduled', documentId]
         );
       }
     }
@@ -169,22 +166,20 @@ router.post('/:id/verify', authenticateToken, authorizeRoles('PATIENT', 'CAREGIV
     // Tests
     if (tests && Array.isArray(tests)) {
       for (const test of tests) {
-        const dateObj = new Date(test.due_date);
-        const validDate = isNaN(dateObj.getTime()) ? new Date() : dateObj;
-
+        const testDate = test.due_date || test.dueDate || 'Pending';
         await query(
           'INSERT INTO tests (patient_id, test_name, due_date, status) VALUES ($1, $2, $3, $4)',
-          [document.patient_id, test.test_name, validDate.toISOString(), 'pending']
+          [targetPatientId, test.test_name || test.testName, testDate, 'pending']
         );
       }
     }
 
-    // Care Tasks (Instructions + Warnings combined for hackathon simplicity)
+    // Care Tasks
     if (care_instructions && Array.isArray(care_instructions)) {
       for (const inst of care_instructions) {
         await query(
           'INSERT INTO care_tasks (patient_id, task_text, status, source_document_id) VALUES ($1, $2, $3, $4)',
-          [document.patient_id, inst.instruction, 'pending', documentId]
+          [targetPatientId, inst.instruction || inst.task_text || inst.title || 'Follow care instructions', 'pending', documentId]
         );
       }
     }

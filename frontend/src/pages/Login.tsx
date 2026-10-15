@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ActivitySquare, Lock, Mail } from 'lucide-react';
+import { ActivitySquare, Lock, Mail, Sparkles } from 'lucide-react';
 import { Button } from '../components/Button';
-
 import { login } from '../services/authService';
 
 export const Login: React.FC = () => {
@@ -12,16 +11,11 @@ export const Login: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !password) {
-      setError('Please fill in all fields');
-      return;
-    }
-    
+  const handleLoginWithCreds = async (eMail: string, pWord: string) => {
     setLoading(true);
+    setError('');
     try {
-      const response = await login(email, password);
+      const response = await login(eMail, pWord);
       localStorage.setItem('cb_auth', JSON.stringify({ token: response.token, user: response.user }));
       navigate('/dashboard');
     } catch (err: any) {
@@ -31,6 +25,22 @@ export const Login: React.FC = () => {
     }
   };
 
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      return;
+    }
+    handleLoginWithCreds(email, password);
+  };
+
+  const handleDemoLogin = (role: 'patient' | 'clinician' | 'caregiver') => {
+    const demoEmail = `${role}@carebridge.com`;
+    setEmail(demoEmail);
+    setPassword('password123');
+    handleLoginWithCreds(demoEmail, 'password123');
+  };
+
   return (
     <div className="auth-container">
       <div className="auth-card glass-panel animate-fade-in">
@@ -38,11 +48,41 @@ export const Login: React.FC = () => {
           <div className="flex-center mb-4 text-primary">
             <ActivitySquare size={48} />
           </div>
-          <h1 className="text-2xl font-bold">Welcome Back</h1>
-          <p className="text-muted mt-2">Sign in to your CareBridge account</p>
+          <h1 className="text-2xl font-bold">Welcome to CareBridge</h1>
+          <p className="text-muted mt-2">Sign in to your healthcare continuity portal</p>
+        </div>
+
+        {/* Quick Demo Access */}
+        <div className="mb-6 p-3 bg-primary/10 border border-primary/20 rounded-xl">
+          <div className="flex items-center gap-2 text-xs font-semibold text-primary mb-2">
+            <Sparkles size={14} /> 1-Click Demo Login
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              type="button"
+              onClick={() => handleDemoLogin('patient')}
+              className="px-2 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-white rounded-lg border border-white/10 transition-colors font-medium"
+            >
+              Patient
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDemoLogin('clinician')}
+              className="px-2 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-white rounded-lg border border-white/10 transition-colors font-medium"
+            >
+              Clinician
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDemoLogin('caregiver')}
+              className="px-2 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-white rounded-lg border border-white/10 transition-colors font-medium"
+            >
+              Caregiver
+            </button>
+          </div>
         </div>
         
-        {error && <div className="error-banner">{error}</div>}
+        {error && <div className="error-banner mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">{error}</div>}
 
         <form onSubmit={handleLogin} className="auth-form flex flex-col gap-4">
           <div className="input-group">
@@ -77,7 +117,7 @@ export const Login: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2 mt-2">
-            <input type="checkbox" id="remember" className="checkbox-custom" />
+            <input type="checkbox" id="remember" className="checkbox-custom" defaultChecked />
             <label htmlFor="remember" className="text-sm text-muted">Remember me for 30 days</label>
           </div>
           

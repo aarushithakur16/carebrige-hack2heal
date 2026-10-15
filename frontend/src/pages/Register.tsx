@@ -31,7 +31,7 @@ export const Register: React.FC = () => {
     setLoading(true);
     try {
       // Backend expects role to be uppercase like 'PATIENT'
-      await register(formData.name, formData.email, formData.password, formData.role.toUpperCase());
+      await register(formData.name, formData.email, formData.password, formData.role.toUpperCase(), formData.phone);
       navigate('/login');
     } catch (err: any) {
       setError(err.message || 'Registration failed');

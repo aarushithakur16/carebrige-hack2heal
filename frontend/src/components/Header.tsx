@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { Bell, Search, UserCircle, LogOut } from 'lucide-react';
+import { getAuthUser } from '../services/api';
 
 export const Header: React.FC = () => {
   const navigate = useNavigate();
+  const user = getAuthUser();
 
   const handleLogout = () => {
     localStorage.removeItem('cb_auth');
@@ -29,8 +31,8 @@ export const Header: React.FC = () => {
         <div className="user-profile">
           <UserCircle size={32} className="text-primary" />
           <div className="user-info">
-            <p className="user-name">Demo User</p>
-            <p className="user-role">Role: Simulated</p>
+            <p className="user-name">{user?.name || 'Aarushi Thakur'}</p>
+            <p className="user-role">Role: {user?.role || 'PATIENT'}</p>
           </div>
           <button onClick={handleLogout} className="icon-btn logout-btn" title="Logout">
             <LogOut size={20} />

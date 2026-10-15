@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL !== undefined
+  ? import.meta.env.VITE_API_BASE_URL
+  : (typeof window !== 'undefined' && window.location.port === '5173' ? '' : 'http://localhost:4000');
 
 export const getAuthToken = () => {
   const authStr = localStorage.getItem('cb_auth');

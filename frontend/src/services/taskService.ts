@@ -11,7 +11,7 @@ export const getTasks = async (): Promise<CareTask[]> => {
 export const updateTaskStatus = async (taskId: string, status: string): Promise<CareTask> => {
   return await apiFetch(`/tasks/${taskId}/status`, {
     method: 'PATCH',
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({ status: status.toUpperCase() }),
   });
 };
 
@@ -19,6 +19,6 @@ export const submitCheckin = async (taskId: string, status: string, note: string
   const user = getAuthUser();
   return await apiFetch(`/checkins`, {
     method: 'POST',
-    body: JSON.stringify({ patientId: user.id, taskId, status, note, timestamp: new Date().toISOString() }),
+    body: JSON.stringify({ patientId: user?.id, taskId: taskId || undefined, status: status || 'completed', note, timestamp: new Date().toISOString() }),
   });
 };

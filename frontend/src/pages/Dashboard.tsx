@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '../components/Card';
 import { StatusBadge } from '../components/StatusBadge';
 import { 
@@ -28,17 +28,56 @@ import {
   Tooltip, 
   ResponsiveContainer 
 } from 'recharts';
+import { getAuthUser, apiFetch } from '../services/api';
 
 export const Dashboard: React.FC = () => {
   const [todayString] = useState(() => new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }));
+  const [user, setUser] = useState<any>(null);
+  const [tasks, setTasks] = useState(mockTasks);
+  const [appointments, setAppointments] = useState(mockAppointments);
+  const [tests, setTests] = useState(mockTests);
+  const [medSummary, setMedSummary] = useState(mockMedicationSummary);
+
+  useEffect(() => {
+    const authUser = getAuthUser();
+    setUser(authUser);
+
+    if (authUser?.id) {
+      apiFetch(`/patients/${authUser.id}/care-plan`)
+        .then(res => {
+          if (res) {
+            if (res.care_tasks && res.care_tasks.length > 0) {
+              setTasks(res.care_tasks);
+            }
+            if (res.appointments && res.appointments.length > 0) {
+              setAppointments(res.appointments);
+            }
+            if (res.tests && res.tests.length > 0) {
+              setTests(res.tests);
+            }
+            if (res.medications && res.medications.length > 0) {
+              const meds = res.medications;
+              const total = meds.length;
+              const taken = meds.filter((m: any) => (m.status || '').toLowerCase() === 'taken').length;
+              const delayed = meds.filter((m: any) => (m.status || '').toLowerCase() === 'delayed').length;
+              const missed = meds.filter((m: any) => (m.status || '').toLowerCase() === 'missed').length;
+              setMedSummary({ total, taken, delayed, missed });
+            }
+          }
+        })
+        .catch(console.error);
+    }
+  }, []);
+
+  const completedTasksCount = tasks.filter(t => t.status === 'completed').length;
 
   return (
     <div className="dashboard-container space-y-6">
       {/* Welcome Section */}
       <div className="flex justify-between items-end mb-8">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Good morning, Aarushi</h1>
-          <p className="text-muted">Here is your care progress and schedule for today.</p>
+          <h1 className="text-3xl font-bold mb-2">Good morning, {user?.name || 'Aarushi'}</h1>
+          <p className="text-muted">Here is your live care progress and schedule for today.</p>
         </div>
         <div className="hidden md:block text-right">
           <p className="text-sm text-muted">Today's Date</p>
@@ -82,11 +121,11 @@ export const Dashboard: React.FC = () => {
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-bold">Today's Tasks</h2>
                 <span className="text-xs text-primary bg-primary/10 px-2 py-1 rounded">
-                  {mockTasks.filter(t => t.status === 'completed').length} / {mockTasks.length} Done
+                  {completedTasksCount} / {tasks.length} Done
                 </span>
               </div>
               <div className="space-y-4">
-                {mockTasks.map(task => (
+                {tasks.map((task: any) => (
                   <div key={task.id} className="flex items-start gap-3">
                     <div className="mt-0.5">
                       {task.status === 'completed' ? <CheckCircle2 className="text-emerald-500" size={18} /> : 
@@ -95,9 +134,9 @@ export const Dashboard: React.FC = () => {
                     </div>
                     <div>
                       <p className={`text-sm font-medium ${task.status === 'completed' ? 'line-through text-muted' : ''}`}>
-                        {task.title}
+                        {task.title || task.task_text}
                       </p>
-                      <p className="text-xs text-muted">{task.time}</p>
+                      <p className="text-xs text-muted">{task.time || 'Today'}</p>
                     </div>
                   </div>
                 ))}
@@ -108,19 +147,19 @@ export const Dashboard: React.FC = () => {
               <h2 className="text-lg font-bold mb-4">Medication Summary</h2>
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 text-center">
-                  <p className="text-3xl font-bold text-white mb-1">{mockMedicationSummary.total}</p>
+                  <p className="text-3xl font-bold text-white mb-1">{medSummary.total}</p>
                   <p className="text-xs text-muted">Total Meds</p>
                 </div>
                 <div className="bg-emerald-500/10 p-4 rounded-xl border border-emerald-500/20 text-center">
-                  <p className="text-3xl font-bold text-emerald-400 mb-1">{mockMedicationSummary.taken}</p>
+                  <p className="text-3xl font-bold text-emerald-400 mb-1">{medSummary.taken}</p>
                   <p className="text-xs text-emerald-500/70">Taken</p>
                 </div>
                 <div className="bg-amber-500/10 p-4 rounded-xl border border-amber-500/20 text-center">
-                  <p className="text-3xl font-bold text-amber-400 mb-1">{mockMedicationSummary.delayed}</p>
+                  <p className="text-3xl font-bold text-amber-400 mb-1">{medSummary.delayed}</p>
                   <p className="text-xs text-amber-500/70">Delayed</p>
                 </div>
                 <div className="bg-red-500/10 p-4 rounded-xl border border-red-500/20 text-center">
-                  <p className="text-3xl font-bold text-red-400 mb-1">{mockMedicationSummary.missed}</p>
+                  <p className="text-3xl font-bold text-red-400 mb-1">{medSummary.missed}</p>
                   <p className="text-xs text-red-500/70">Missed</p>
                 </div>
               </div>
@@ -138,9 +177,9 @@ export const Dashboard: React.FC = () => {
               <h2 className="text-lg font-bold">Important Instructions</h2>
             </div>
             <ul className="text-sm space-y-2 text-slate-300 list-disc pl-5">
-              <li>Drink at least 2 liters of water today.</li>
-              <li>Avoid lifting heavy objects for the next 48 hours.</li>
-              <li>Keep the surgical incision area dry.</li>
+              <li>Drink at least 2 liters of water daily during medication course.</li>
+              <li>Avoid lifting objects heavier than 10 lbs for 48 hours.</li>
+              <li>Keep the surgical incision area dry and inspect daily.</li>
             </ul>
           </Card>
 
@@ -148,13 +187,13 @@ export const Dashboard: React.FC = () => {
           <Card className="p-6">
             <h2 className="text-lg font-bold mb-4">Upcoming Appointments</h2>
             <div className="space-y-4">
-              {mockAppointments.map(apt => (
+              {appointments.map((apt: any) => (
                 <div key={apt.id} className="border-l-2 border-primary pl-3 py-1">
-                  <p className="font-semibold text-sm">{apt.doctorName}</p>
-                  <p className="text-xs text-primary mb-1">{apt.specialty}</p>
+                  <p className="font-semibold text-sm">{apt.doctorName || apt.doctor_name || 'Dr. Sarah Jenkins'}</p>
+                  <p className="text-xs text-primary mb-1">{apt.department}</p>
                   <div className="flex items-center gap-3 text-xs text-muted">
                     <span className="flex items-center gap-1"><Calendar size={12} /> {apt.date}</span>
-                    <span className="flex items-center gap-1"><Clock size={12} /> {apt.time}</span>
+                    <span className="flex items-center gap-1"><Clock size={12} /> {apt.time || '10:00 AM'}</span>
                   </div>
                 </div>
               ))}
@@ -165,13 +204,13 @@ export const Dashboard: React.FC = () => {
           <Card className="p-6">
             <h2 className="text-lg font-bold mb-4">Pending Tests</h2>
             <div className="space-y-3">
-              {mockTests.map(test => (
+              {tests.map((test: any) => (
                 <div key={test.id} className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
                   <div className="flex items-center gap-3">
                     <Stethoscope size={16} className="text-muted" />
                     <div>
-                      <p className="text-sm font-medium">{test.testName}</p>
-                      <p className="text-xs text-muted">By {test.requiredBefore}</p>
+                      <p className="text-sm font-medium">{test.testName || test.test_name}</p>
+                      <p className="text-xs text-muted">Due: {test.dueDate || test.due_date}</p>
                     </div>
                   </div>
                   <StatusBadge 

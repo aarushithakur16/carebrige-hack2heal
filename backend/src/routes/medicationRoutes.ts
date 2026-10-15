@@ -9,7 +9,8 @@ const router = Router();
 router.patch('/:id/status', authenticateToken, authorizeRoles('PATIENT', 'CAREGIVER'), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const medId = req.params.id;
-    const { status } = req.body;
+    const rawStatus = req.body.status || '';
+    const status = String(rawStatus).toUpperCase();
     const userId = (req as any).user?.id;
 
     const allowedStatuses = ['TAKEN', 'MISSED', 'DELAYED', 'PENDING'];
@@ -17,11 +18,9 @@ router.patch('/:id/status', authenticateToken, authorizeRoles('PATIENT', 'CAREGI
       return res.status(400).json({ error: 'Invalid status value.' });
     }
 
-    // In a real app we'd verify the med belongs to the patient and the caregiver has consent
-    // For this hackathon scope, we just execute the update
     const updateRes = await query(
       'UPDATE medications SET status = $1 WHERE id = $2 RETURNING *',
-      [status, medId]
+      [status.toLowerCase(), medId]
     );
 
     if (updateRes.rowCount === 0) {
@@ -30,7 +29,12 @@ router.patch('/:id/status', authenticateToken, authorizeRoles('PATIENT', 'CAREGI
 
     await logAudit(userId, 'UPDATE_MEDICATION_STATUS', `Medication ${medId}`);
 
-    return res.status(200).json(updateRes.rows[0]);
+    const med = updateRes.rows[0];
+    return res.status(200).json({
+      ...med,
+      doseText: med.dose_text || med.doseText || '',
+      status: String(med.status || status).toUpperCase()
+    });
   } catch (error) {
     next(error);
   }

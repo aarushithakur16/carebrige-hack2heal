@@ -8,7 +8,8 @@ const router = Router();
 router.patch('/tasks/:id/status', authenticateToken, authorizeRoles('PATIENT', 'CAREGIVER'), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const taskId = req.params.id;
-    const { status } = req.body;
+    const rawStatus = req.body.status || '';
+    const status = String(rawStatus).toUpperCase();
     const userId = (req as any).user?.id;
 
     const allowedStatuses = ['PENDING', 'COMPLETED', 'MISSED'];
@@ -18,7 +19,7 @@ router.patch('/tasks/:id/status', authenticateToken, authorizeRoles('PATIENT', '
 
     const updateRes = await query(
       'UPDATE care_tasks SET status = $1 WHERE id = $2 RETURNING *',
-      [status, taskId]
+      [status.toLowerCase(), taskId]
     );
 
     if (updateRes.rowCount === 0) {
@@ -27,7 +28,14 @@ router.patch('/tasks/:id/status', authenticateToken, authorizeRoles('PATIENT', '
 
     await logAudit(userId, 'UPDATE_TASK_STATUS', `Task ${taskId}`);
 
-    return res.status(200).json(updateRes.rows[0]);
+    const t = updateRes.rows[0];
+    return res.status(200).json({
+      ...t,
+      title: t.task_text || t.title || 'Task',
+      time: t.time || '09:00 AM',
+      type: t.type || 'medication',
+      status: (t.status || 'pending').toLowerCase()
+    });
   } catch (error) {
     next(error);
   }
@@ -38,16 +46,18 @@ router.post('/checkins', authenticateToken, authorizeRoles('PATIENT'), async (re
     const { patientId, taskId, timestamp, status, note } = req.body;
     const userId = (req as any).user?.id;
 
-    if (patientId !== userId) {
+    if (patientId && patientId !== userId) {
       return res.status(403).json({ error: 'Cannot create check-in for another patient.' });
     }
 
+    const targetPatient = patientId || userId;
+
     const insertRes = await query(
       'INSERT INTO checkins (patient_id, task_id, timestamp, status, note) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [patientId, taskId || null, timestamp || new Date().toISOString(), status, note]
+      [targetPatient, taskId || null, timestamp || new Date().toISOString(), status || 'completed', note]
     );
 
-    await logAudit(userId, 'CREATE_CHECKIN', `Patient ${patientId}`);
+    await logAudit(userId, 'CREATE_CHECKIN', `Patient ${targetPatient}`);
 
     return res.status(201).json(insertRes.rows[0]);
   } catch (error) {

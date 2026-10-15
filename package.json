@@ -1,0 +1,24 @@
+{
+  "name": "carebridge-heal2hack",
+  "version": "1.0.0",
+  "description": "CareBridge - AI Healthcare Continuity & Post-Discharge Care Plan Platform",
+  "main": "dev.js",
+  "scripts": {
+    "dev": "node dev.js",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "build:frontend": "npm run build --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "start": "npm run start --prefix backend",
+    "test": "npm run test --prefix backend"
+  },
+  "keywords": [
+    "carebridge",
+    "healthcare",
+    "ai",
+    "post-op",
+    "discharge"
+  ],
+  "author": "",
+  "license": "ISC"
+}

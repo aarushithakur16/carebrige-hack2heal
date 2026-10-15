@@ -14,7 +14,8 @@ router.post('/register', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Missing required fields.' });
     }
     
-    if (!['PATIENT', 'CAREGIVER', 'CLINICIAN'].includes(role)) {
+    const upperRole = String(role).toUpperCase();
+    if (!['PATIENT', 'CAREGIVER', 'CLINICIAN'].includes(upperRole)) {
       return res.status(400).json({ error: 'Invalid role specified.' });
     }
 
@@ -28,13 +29,13 @@ router.post('/register', async (req: Request, res: Response) => {
 
     const insertRes = await query(
       'INSERT INTO users (name, email, password_hash, role, contact) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, role',
-      [name, email, hash, role, contact]
+      [name, email, hash, upperRole, contact || '']
     );
 
     const user = insertRes.rows[0];
 
     // If role is PATIENT, create patient profile
-    if (role === 'PATIENT') {
+    if (upperRole === 'PATIENT') {
       await query('INSERT INTO patients (user_id) VALUES ($1)', [user.id]);
     }
 
@@ -49,6 +50,10 @@ router.post('/login', async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
     
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required.' });
+    }
+
     const userRes = await query('SELECT * FROM users WHERE email = $1', [email]);
     if (userRes.rowCount === 0) {
       return res.status(401).json({ error: 'Invalid credentials.' });
@@ -61,7 +66,7 @@ router.post('/login', async (req: Request, res: Response) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, role: user.role },
+      { id: user.id, role: user.role, name: user.name, email: user.email },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -69,7 +74,7 @@ router.post('/login', async (req: Request, res: Response) => {
     return res.status(200).json({
       message: 'Login successful',
       token,
-      user: { id: user.id, name: user.name, role: user.role }
+      user: { id: user.id, name: user.name, email: user.email, role: user.role }
     });
   } catch (error: any) {
     console.error('Login error:', error);

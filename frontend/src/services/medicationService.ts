@@ -11,6 +11,6 @@ export const getMedications = async (): Promise<Medication[]> => {
 export const updateMedicationStatus = async (medId: string, status: string): Promise<Medication> => {
   return await apiFetch(`/medications/${medId}/status`, {
     method: 'PATCH',
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({ status: status.toUpperCase() }),
   });
 };
