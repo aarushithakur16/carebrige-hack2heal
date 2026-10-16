@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ActivitySquare, User, Mail, Phone, Lock } from 'lucide-react';
+import { User, Mail, Phone, Lock, ArrowRight, ShieldCheck, Heart } from 'lucide-react';
 import { Button } from '../components/Button';
-
 import { register } from '../services/authService';
 
 export const Register: React.FC = () => {
@@ -29,12 +28,12 @@ export const Register: React.FC = () => {
     }
     
     setLoading(true);
+    setError('');
     try {
-      // Backend expects role to be uppercase like 'PATIENT'
       await register(formData.name, formData.email, formData.password, formData.role.toUpperCase(), formData.phone);
       navigate('/login');
     } catch (err: any) {
-      setError(err.message || 'Registration failed');
+      setError(err.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -42,78 +41,134 @@ export const Register: React.FC = () => {
 
   return (
     <div className="auth-container py-12">
-      <div className="auth-card glass-panel animate-fade-in" style={{ maxWidth: '500px' }}>
-        <div className="auth-header text-center mb-8">
-          <div className="flex-center mb-4 text-primary">
-            <ActivitySquare size={40} />
+      <div className="auth-card animate-fade-in" style={{ maxWidth: '490px' }}>
+        <div className="text-center mb-6">
+          <div className="inline-flex p-3 rounded-2xl bg-forest-green text-soft-mint mb-3 shadow-md">
+            <Heart size={28} className="fill-current" />
           </div>
-          <h1 className="text-2xl font-bold">Create an Account</h1>
-          <p className="text-muted mt-2">Join CareBridge for seamless healthcare continuity</p>
+          <h1 className="text-2xl font-extrabold tracking-tight text-charcoal">Create Your Patient Account</h1>
+          <p className="text-xs text-muted mt-1">Join the CareBridge post-discharge continuity portal</p>
         </div>
         
-        {error && <div className="error-banner">{error}</div>}
+        {error && (
+          <div className="error-banner animate-fade-in flex items-center gap-2">
+            <span>{error}</span>
+          </div>
+        )}
 
-        <form onSubmit={handleRegister} className="auth-form flex flex-col gap-4">
+        <form onSubmit={handleRegister} className="flex flex-col gap-4">
           <div className="input-group">
-            <label>Full Name</label>
+            <label>Full Legal Name</label>
             <div className="input-with-icon">
-              <User size={18} className="input-icon" />
-              <input name="name" type="text" onChange={handleChange} placeholder="Jane Doe" className="form-input" />
+              <User size={17} className="input-icon" />
+              <input 
+                name="name" 
+                type="text" 
+                value={formData.name}
+                onChange={handleChange} 
+                placeholder="Aarushi Thakur" 
+                className="form-input" 
+                required 
+              />
             </div>
           </div>
           
-          <div className="grid-2-col gap-4 flex">
-            <div className="input-group flex-1">
+          <div className="grid-2-col">
+            <div className="input-group">
               <label>Email Address</label>
               <div className="input-with-icon">
-                <Mail size={18} className="input-icon" />
-                <input name="email" type="email" onChange={handleChange} placeholder="jane@example.com" className="form-input" />
+                <Mail size={17} className="input-icon" />
+                <input 
+                  name="email" 
+                  type="email" 
+                  value={formData.email}
+                  onChange={handleChange} 
+                  placeholder="patient@carebridge.com" 
+                  className="form-input" 
+                  required 
+                />
               </div>
             </div>
             
-            <div className="input-group flex-1">
-              <label>Phone Number</label>
+            <div className="input-group">
+              <label>Contact Phone</label>
               <div className="input-with-icon">
-                <Phone size={18} className="input-icon" />
-                <input name="phone" type="tel" onChange={handleChange} placeholder="(555) 123-4567" className="form-input" />
+                <Phone size={17} className="input-icon" />
+                <input 
+                  name="phone" 
+                  type="tel" 
+                  value={formData.phone}
+                  onChange={handleChange} 
+                  placeholder="(555) 019-2834" 
+                  className="form-input" 
+                />
               </div>
             </div>
           </div>
           
           <div className="input-group">
-            <label>I am a...</label>
-            <select name="role" onChange={handleChange} className="form-input pl-3">
-              <option value="Patient">Patient</option>
-              <option value="Caregiver">Caregiver</option>
-              <option value="Clinician">Clinician</option>
+            <label>Primary Account Role</label>
+            <select 
+              name="role" 
+              value={formData.role} 
+              onChange={handleChange} 
+              className="form-input"
+            >
+              <option value="PATIENT">Patient (Receiving Care)</option>
+              <option value="CAREGIVER">Caregiver (Family / Health Aide)</option>
+              <option value="CLINICIAN">Clinician (Physician / Nurse)</option>
             </select>
           </div>
           
-          <div className="grid-2-col gap-4 flex">
-            <div className="input-group flex-1">
+          <div className="grid-2-col">
+            <div className="input-group">
               <label>Password</label>
               <div className="input-with-icon">
-                <Lock size={18} className="input-icon" />
-                <input name="password" type="password" onChange={handleChange} placeholder="••••••••" className="form-input" />
+                <Lock size={17} className="input-icon" />
+                <input 
+                  name="password" 
+                  type="password" 
+                  value={formData.password}
+                  onChange={handleChange} 
+                  placeholder="••••••••" 
+                  className="form-input" 
+                  required 
+                />
               </div>
             </div>
             
-            <div className="input-group flex-1">
+            <div className="input-group">
               <label>Confirm Password</label>
               <div className="input-with-icon">
-                <Lock size={18} className="input-icon" />
-                <input name="confirm" type="password" onChange={handleChange} placeholder="••••••••" className="form-input" />
+                <Lock size={17} className="input-icon" />
+                <input 
+                  name="confirm" 
+                  type="password" 
+                  value={formData.confirm}
+                  onChange={handleChange} 
+                  placeholder="••••••••" 
+                  className="form-input" 
+                  required 
+                />
               </div>
             </div>
           </div>
           
-          <Button type="submit" className="w-full mt-4 py-3" disabled={loading}>
-            {loading ? 'Creating Account...' : 'Create Account'}
+          <Button type="submit" className="w-full mt-3 py-3" disabled={loading} icon={ArrowRight}>
+            {loading ? 'Creating Account...' : 'Complete Registration'}
           </Button>
         </form>
         
-        <div className="mt-6 text-center text-sm text-muted">
-          Already have an account? <Link to="/login" className="text-primary font-medium hover-underline">Sign in</Link>
+        <div className="mt-6 pt-5 border-t border-border-light flex items-center justify-between text-xs text-muted">
+          <span>Already registered?</span>
+          <Link to="/login" className="text-emerald font-bold hover:text-forest hover-underline flex items-center gap-1">
+            Sign in here <ArrowRight size={13} />
+          </Link>
+        </div>
+
+        <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-muted">
+          <ShieldCheck size={14} className="text-emerald" />
+          <span>Patient data protected under HIPAA compliance guidelines</span>
         </div>
       </div>
     </div>

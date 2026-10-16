@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ActivitySquare, Lock, Mail, Sparkles, User, Stethoscope, HeartHandshake, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Lock, Mail, Sparkles, User, Stethoscope, HeartHandshake, ArrowRight, ShieldCheck, Heart } from 'lucide-react';
 import { Button } from '../components/Button';
 import { login } from '../services/authService';
 
@@ -43,58 +43,58 @@ export const Login: React.FC = () => {
 
   return (
     <div className="auth-container">
-      <div className="auth-card glass-panel animate-fade-in">
+      <div className="auth-card animate-fade-in">
         <div className="text-center mb-6">
-          <div className="inline-flex p-3.5 rounded-2xl bg-gradient-to-br from-teal-500/20 to-teal-900/40 border border-teal-400/30 text-teal-300 mb-3 shadow-lg shadow-teal-500/10">
-            <ActivitySquare size={34} />
+          <div className="inline-flex p-3 rounded-2xl bg-forest-green text-soft-mint mb-3 shadow-md">
+            <Heart size={28} className="fill-current" />
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">CareBridge</h1>
+          <h1 className="text-2xl font-extrabold text-charcoal tracking-tight">CareBridge</h1>
           <p className="text-xs text-muted mt-1">Healthcare Continuity & Post-Discharge Recovery</p>
         </div>
 
         {/* 1-Click Interactive Demo Personas for Judges */}
-        <div className="mb-6 p-3.5 bg-teal-950/40 border border-teal-500/25 rounded-2xl">
-          <div className="flex items-center justify-between text-xs font-semibold text-teal-300 mb-2.5 px-0.5">
+        <div className="mb-6 p-4 rounded-2xl bg-pale-sage/60 border border-emerald/20">
+          <div className="flex items-center justify-between text-xs font-bold text-forest mb-3">
             <span className="flex items-center gap-1.5">
-              <Sparkles size={14} className="text-teal-300" /> 1-Click Persona Login
+              <Sparkles size={14} className="text-emerald" /> 1-Click Persona Access
             </span>
-            <span className="text-[10px] text-teal-400/70 font-normal uppercase tracking-wider">Demo Ready</span>
+            <span className="text-[10px] uppercase tracking-wider text-emerald font-extrabold">Instant Login</span>
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2.5">
             <button
               type="button"
               onClick={() => handleDemoLogin('patient')}
-              className="p-2.5 bg-slate-900/80 hover:bg-teal-900/30 rounded-xl border border-teal-500/20 hover:border-teal-400/50 transition-all flex flex-col items-center text-center group"
+              className="p-3 bg-white hover:bg-soft-mint/40 rounded-xl border border-border-light hover:border-emerald transition-all flex flex-col items-center text-center group shadow-sm"
             >
-              <div className="p-1.5 rounded-lg bg-teal-500/10 text-teal-300 group-hover:scale-110 transition-transform mb-1">
+              <div className="p-1.5 rounded-lg bg-soft-mint text-forest group-hover:scale-110 transition-transform mb-1">
                 <User size={15} />
               </div>
-              <span className="text-xs font-semibold text-white">Patient</span>
+              <span className="text-xs font-bold text-charcoal">Patient</span>
               <span className="text-[10px] text-muted">Aarushi T.</span>
             </button>
 
             <button
               type="button"
               onClick={() => handleDemoLogin('clinician')}
-              className="p-2.5 bg-slate-900/80 hover:bg-teal-900/30 rounded-xl border border-teal-500/20 hover:border-teal-400/50 transition-all flex flex-col items-center text-center group"
+              className="p-3 bg-white hover:bg-muted-lavender/40 rounded-xl border border-border-light hover:border-purple-300 transition-all flex flex-col items-center text-center group shadow-sm"
             >
-              <div className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-300 group-hover:scale-110 transition-transform mb-1">
+              <div className="p-1.5 rounded-lg bg-muted-lavender text-purple-900 group-hover:scale-110 transition-transform mb-1">
                 <Stethoscope size={15} />
               </div>
-              <span className="text-xs font-semibold text-white">Clinician</span>
+              <span className="text-xs font-bold text-charcoal">Clinician</span>
               <span className="text-[10px] text-muted">Dr. Sarah</span>
             </button>
 
             <button
               type="button"
               onClick={() => handleDemoLogin('caregiver')}
-              className="p-2.5 bg-slate-900/80 hover:bg-teal-900/30 rounded-xl border border-teal-500/20 hover:border-teal-400/50 transition-all flex flex-col items-center text-center group"
+              className="p-3 bg-white hover:bg-soft-peach/40 rounded-xl border border-border-light hover:border-orange-300 transition-all flex flex-col items-center text-center group shadow-sm"
             >
-              <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-300 group-hover:scale-110 transition-transform mb-1">
+              <div className="p-1.5 rounded-lg bg-soft-peach text-orange-950 group-hover:scale-110 transition-transform mb-1">
                 <HeartHandshake size={15} />
               </div>
-              <span className="text-xs font-semibold text-white">Caregiver</span>
+              <span className="text-xs font-bold text-charcoal">Caregiver</span>
               <span className="text-[10px] text-muted">Jane Doe</span>
             </button>
           </div>
@@ -125,7 +125,7 @@ export const Login: React.FC = () => {
           <div className="input-group">
             <div className="flex justify-between items-center mb-1">
               <label>Password</label>
-              <a href="#" className="text-xs text-teal-400 hover:text-teal-300 hover-underline">Forgot?</a>
+              <a href="#" className="text-xs text-emerald hover:text-forest hover-underline font-semibold">Forgot?</a>
             </div>
             <div className="input-with-icon">
               <Lock size={17} className="input-icon" />
@@ -150,15 +150,15 @@ export const Login: React.FC = () => {
           </Button>
         </form>
         
-        <div className="mt-6 pt-5 border-t border-white/5 flex items-center justify-between text-xs text-muted">
+        <div className="mt-6 pt-5 border-t border-border-light flex items-center justify-between text-xs text-muted">
           <span>Need an account?</span>
-          <Link to="/register" className="text-teal-400 font-semibold hover:text-teal-300 hover-underline flex items-center gap-1">
+          <Link to="/register" className="text-emerald font-bold hover:text-forest hover-underline flex items-center gap-1">
             Register new patient <ArrowRight size={13} />
           </Link>
         </div>
 
-        <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-muted/60">
-          <ShieldCheck size={13} className="text-emerald-400/80" />
+        <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-muted">
+          <ShieldCheck size={14} className="text-emerald" />
           <span>Encrypted HIPAA-compliant clinical gateway</span>
         </div>
       </div>

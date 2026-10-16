@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Card } from '../components/Card';
 import { Button } from '../components/Button';
-import { Calendar as CalendarIcon, MapPin, Clock } from 'lucide-react';
+import { Calendar as CalendarIcon, MapPin, Clock, Video, Sparkles, Check } from 'lucide-react';
 import { getAppointments } from '../services/appointmentService';
 import type { Appointment } from '../types';
 
 export const Appointments: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [joinedId, setJoinedId] = useState<string | null>(null);
 
   useEffect(() => {
     getAppointments()
@@ -22,7 +22,7 @@ export const Appointments: React.FC = () => {
               department: 'Cardiology & Surgical Follow-Up',
               date: 'Oct 22, 2026',
               time: '10:30 AM',
-              location: 'Building B, Room 410'
+              location: 'Building B, Room 410 (Main Medical Wing)'
             },
             {
               id: 'app-2',
@@ -30,7 +30,7 @@ export const Appointments: React.FC = () => {
               department: 'Physical Therapy Consultation',
               date: 'Oct 26, 2026',
               time: '02:00 PM',
-              location: 'Rehab Center Suite 12'
+              location: 'Rehab Center Suite 12 (North Campus)'
             }
           ]);
         }
@@ -43,46 +43,97 @@ export const Appointments: React.FC = () => {
             department: 'Cardiology & Surgical Follow-Up',
             date: 'Oct 22, 2026',
             time: '10:30 AM',
-            location: 'Building B, Room 410'
+            location: 'Building B, Room 410 (Main Medical Wing)'
           }
         ]);
       })
       .finally(() => setLoading(false));
   }, []);
 
+  const handleJoin = (id: string) => {
+    setJoinedId(id);
+    setTimeout(() => setJoinedId(null), 3000);
+  };
+
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-6 animate-fade-in">
-      <h1 className="text-3xl font-bold">Upcoming Appointments</h1>
-      <p className="text-muted mb-6">Keep track of your scheduled consultations and follow-ups.</p>
+    <div className="max-w-5xl mx-auto space-y-6 animate-fade-in pb-12">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-pale-sage text-forest border border-emerald/20 flex items-center gap-1.5">
+              <Sparkles size={13} className="text-emerald" /> Continuous Care Calendar
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-charcoal tracking-tight">Scheduled Consultations</h1>
+          <p className="text-sm text-muted mt-1">
+            Confirmed doctor appointments, post-operative check-ups, and rehabilitation reviews.
+          </p>
+        </div>
+      </div>
 
       {loading ? (
-        <div className="p-8 text-muted">Loading appointments...</div>
+        <div className="p-12 text-center text-muted animate-pulse">Loading scheduled consultations...</div>
       ) : appointments.length === 0 ? (
-        <Card className="p-8 text-center text-muted">No upcoming appointments scheduled.</Card>
+        <div className="content-card p-8 text-center text-muted">
+          <CalendarIcon size={32} className="mx-auto text-emerald mb-2 opacity-60" />
+          <p className="text-sm font-semibold">No upcoming appointments scheduled.</p>
+        </div>
       ) : (
         <div className="grid md:grid-cols-2 gap-6">
-          {appointments.map(app => (
-            <Card key={app.id} className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-3 bg-blue-500/10 text-blue-400 rounded-lg">
-                  <CalendarIcon size={24} />
-                </div>
+          {appointments.map(app => {
+            const dateParts = (app.date || '').split(' ');
+            const month = dateParts[0] || 'OCT';
+            const day = dateParts[1] ? dateParts[1].replace(',', '') : '22';
+
+            return (
+              <div key={app.id} className="content-card p-6 flex flex-col justify-between hover-lift shadow-card">
                 <div>
-                  <h3 className="text-xl font-bold">{app.doctorName}</h3>
-                  <p className="text-sm text-primary">{app.department}</p>
+                  <div className="flex items-start gap-4 mb-4">
+                    {/* Calendar Badge */}
+                    <div className="w-14 h-14 rounded-2xl bg-pale-sage border border-emerald/25 flex flex-col items-center justify-center shrink-0 text-center shadow-sm">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald">{month}</span>
+                      <span className="text-xl font-black text-forest leading-none">{day}</span>
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-base font-extrabold text-charcoal truncate">
+                        {app.doctorName || (app as any).doctor_name || 'Attending Physician'}
+                      </h3>
+                      <p className="text-xs text-muted truncate mt-0.5">{app.department}</p>
+                      <span className="inline-block mt-2 text-[11px] px-2.5 py-0.5 rounded-full bg-soft-mint text-forest font-bold">
+                        Post-Discharge Follow-Up
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5 mt-5 text-xs text-charcoal border-t border-border-light pt-4">
+                    <div className="flex items-center gap-2">
+                      <Clock size={15} className="text-emerald shrink-0" />
+                      <span className="font-semibold">{app.time || '10:00 AM EST'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin size={15} className="text-emerald shrink-0" />
+                      <span className="truncate text-muted">{app.location || 'Building A, Room 302'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-border-light flex gap-3">
+                  <Button variant="secondary" className="flex-1 text-xs">
+                    Reschedule
+                  </Button>
+                  <Button 
+                    className="flex-1 text-xs" 
+                    icon={joinedId === app.id ? Check : Video}
+                    onClick={() => handleJoin(app.id)}
+                  >
+                    {joinedId === app.id ? 'Connecting...' : 'Join Video Session'}
+                  </Button>
                 </div>
               </div>
-              <div className="space-y-3 mt-4 text-sm text-slate-300">
-                <div className="flex items-center gap-2"><CalendarIcon size={16} className="text-muted" /> {app.date}</div>
-                <div className="flex items-center gap-2"><Clock size={16} className="text-muted" /> {app.time}</div>
-                <div className="flex items-center gap-2"><MapPin size={16} className="text-muted" /> {app.location}</div>
-              </div>
-              <div className="mt-6 flex gap-3">
-                <Button variant="secondary" className="w-full">Reschedule</Button>
-                <Button className="w-full">Join Virtual</Button>
-              </div>
-            </Card>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

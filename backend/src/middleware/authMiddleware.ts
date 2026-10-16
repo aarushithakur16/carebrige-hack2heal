@@ -35,7 +35,7 @@ export const authorizeRoles = (...allowedRoles: string[]) => {
 
 export const verifyPatientConsentForCaregiver = async (req: AuthRequest, res: Response, next: NextFunction) => {
   if (req.user?.role === 'CAREGIVER') {
-    const targetPatientId = req.params.patientId || req.body.patientId;
+    const targetPatientId = req.params.patientId || req.params.id || (req.query.patientId as string) || req.body.patientId;
     if (!targetPatientId) {
       return res.status(400).json({ error: 'Missing patient ID for consent verification.' });
     }

@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Card } from '../components/Card';
 import { Button } from '../components/Button';
-import { Stethoscope, Calendar } from 'lucide-react';
+import { Stethoscope, Calendar, Sparkles, CheckCircle2 } from 'lucide-react';
 import { getTests } from '../services/appointmentService';
 import type { Test } from '../types';
+import { StatusBadge } from '../components/StatusBadge';
 
 export const PendingTests: React.FC = () => {
   const [tests, setTests] = useState<Test[]>([]);
   const [loading, setLoading] = useState(true);
+  const [scheduledId, setScheduledId] = useState<string | null>(null);
 
   useEffect(() => {
     getTests()
@@ -15,57 +16,102 @@ export const PendingTests: React.FC = () => {
         if (data && data.length > 0) {
           setTests(data);
         } else {
-          // Default fallback
           setTests([
-            { id: 't1', testName: 'Complete Blood Count (CBC)', dueDate: 'Oct 20', status: 'pending' },
-            { id: 't2', testName: 'Chest X-Ray', dueDate: 'Oct 24', status: 'scheduled' }
+            { id: 't1', testName: 'Complete Blood Count (CBC) & Metabolic Panel', dueDate: 'Oct 20, 2026', status: 'pending' },
+            { id: 't2', testName: 'Chest X-Ray (Follow-Up Pulmonary Check)', dueDate: 'Oct 24, 2026', status: 'scheduled' }
           ]);
         }
       })
       .catch(() => {
         setTests([
-          { id: 't1', testName: 'Complete Blood Count (CBC)', dueDate: 'Oct 20', status: 'pending' },
-          { id: 't2', testName: 'Chest X-Ray', dueDate: 'Oct 24', status: 'scheduled' }
+          { id: 't1', testName: 'Complete Blood Count (CBC) & Metabolic Panel', dueDate: 'Oct 20, 2026', status: 'pending' },
+          { id: 't2', testName: 'Chest X-Ray (Follow-Up Pulmonary Check)', dueDate: 'Oct 24, 2026', status: 'scheduled' }
         ]);
       })
       .finally(() => setLoading(false));
   }, []);
 
+  const handleSchedule = (id: string) => {
+    setScheduledId(id);
+    setTests(prev => prev.map(t => t.id === id ? { ...t, status: 'scheduled' } : t));
+    setTimeout(() => setScheduledId(null), 2500);
+  };
+
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-6 animate-fade-in">
-      <h1 className="text-3xl font-bold">Pending Medical Tests</h1>
-      <p className="text-muted mb-6">Tests and diagnostics ordered by your clinician.</p>
+    <div className="max-w-5xl mx-auto space-y-6 animate-fade-in pb-12">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-pale-sage text-forest border border-emerald/20 flex items-center gap-1.5">
+              <Sparkles size={13} className="text-emerald" /> Diagnostic Orders
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-charcoal tracking-tight">Ordered Clinical Tests</h1>
+          <p className="text-sm text-muted mt-1">
+            Laboratory panels, imaging diagnostics, and specialized testing ordered by your attending physician.
+          </p>
+        </div>
+      </div>
 
       {loading ? (
-        <div className="p-8 text-muted">Loading pending tests...</div>
+        <div className="p-12 text-center text-muted animate-pulse">Loading diagnostic test orders...</div>
       ) : tests.length === 0 ? (
-        <Card className="p-8 text-center text-muted">No pending tests scheduled.</Card>
+        <div className="content-card p-8 text-center text-muted">
+          <Stethoscope size={32} className="mx-auto text-emerald mb-2 opacity-60" />
+          <p className="text-sm font-semibold">No diagnostic tests currently pending.</p>
+        </div>
       ) : (
         <div className="space-y-4">
-          {tests.map(test => (
-            <Card key={test.id} className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-purple-500/10 text-purple-400 rounded-lg">
-                  <Stethoscope size={24} />
+          {tests.map(test => {
+            const isScheduled = (test.status || '').toLowerCase() === 'scheduled';
+            return (
+              <div key={test.id} className="content-card p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover-lift shadow-card">
+                <div className="flex items-start gap-4">
+                  <div className={`p-3 rounded-2xl shrink-0 ${
+                    isScheduled 
+                      ? 'bg-soft-mint text-forest' 
+                      : 'bg-pale-sage text-forest'
+                  }`}>
+                    <Stethoscope size={24} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base font-extrabold text-charcoal">{test.testName || (test as any).test_name}</h3>
+                      <StatusBadge 
+                        status={isScheduled ? 'stable' : 'warning'} 
+                        label={isScheduled ? 'Appointment Booked' : 'Action Required'} 
+                      />
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-muted mt-1.5">
+                      <span className="flex items-center gap-1 font-semibold text-charcoal">
+                        <Calendar size={13} className="text-emerald" /> Due: {test.dueDate || (test as any).due_date}
+                      </span>
+                      <span>•</span>
+                      <span>Lab Preparation: Fasting 8 hrs prior recommended</span>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold">{test.testName}</h3>
-                  <p className="text-sm text-muted flex items-center gap-1 mt-1">
-                    <Calendar size={14} /> Due by: {test.dueDate}
-                  </p>
+
+                <div className="w-full sm:w-auto">
+                  {isScheduled ? (
+                    <div className="flex items-center gap-2 text-forest bg-soft-mint px-4 py-2 rounded-full text-xs font-bold">
+                      <CheckCircle2 size={16} className="text-emerald" /> Scheduled at Lab
+                    </div>
+                  ) : (
+                    <Button 
+                      variant="primary" 
+                      className="w-full sm:w-auto text-xs py-2 px-5 font-bold"
+                      isLoading={scheduledId === test.id}
+                      onClick={() => handleSchedule(test.id)}
+                    >
+                      Book Lab Appointment
+                    </Button>
+                  )}
                 </div>
               </div>
-              <div>
-                {test.status === 'scheduled' ? (
-                  <span className="text-sm font-semibold px-3 py-1 bg-blue-500/10 text-blue-400 rounded-full border border-blue-500/20">
-                    Scheduled
-                  </span>
-                ) : (
-                  <Button variant="secondary">Schedule Test</Button>
-                )}
-              </div>
-            </Card>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

@@ -103,7 +103,7 @@ router.post('/:id/extract', authenticateToken, authorizeRoles('PATIENT', 'CLINIC
 });
 
 // 3. Verify Document Extraction & Create Care Plan
-router.post('/:id/verify', authenticateToken, authorizeRoles('PATIENT', 'CAREGIVER'), async (req: Request, res: Response) => {
+router.post('/:id/verify', authenticateToken, authorizeRoles('PATIENT', 'CAREGIVER', 'CLINICIAN'), async (req: Request, res: Response) => {
   try {
     const documentId = req.params.id;
     const userId = (req as any).user?.id;

@@ -8,9 +8,12 @@ import {
   HeartPulse, 
   Users, 
   ActivitySquare,
-  ShieldCheck,
-  X
+  Sparkles,
+  Heart,
+  X,
+  ArrowUpRight
 } from 'lucide-react';
+import { getAuthUser } from '../services/api';
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -29,22 +32,28 @@ const NAV_ITEMS = [
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+  const user = getAuthUser();
+
   return (
     <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+      {/* Brand Header */}
       <div className="sidebar-logo">
         <div className="logo-badge">
-          <ActivitySquare size={22} />
+          <Heart className="fill-current" size={20} />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-lg font-bold text-gradient leading-tight">CareBridge</div>
-          <div className="text-[11px] text-muted font-medium tracking-wide flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Post-Discharge
+          <div className="text-xl font-extrabold tracking-tight text-forest leading-tight">
+            CareBridge
+          </div>
+          <div className="text-[11px] text-muted font-medium flex items-center gap-1.5 mt-0.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald"></span>
+            <span>Healthcare Continuity</span>
           </div>
         </div>
         {onClose && (
           <button 
             onClick={onClose} 
-            className="mobile-menu-toggle p-1.5 text-muted hover:text-white"
+            className="mobile-menu-toggle p-1.5 text-muted hover:text-charcoal"
             aria-label="Close navigation"
           >
             <X size={18} />
@@ -52,8 +61,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         )}
       </div>
       
+      {/* Navigation */}
       <nav className="sidebar-nav">
-        <div className="text-[11px] font-bold uppercase tracking-wider text-muted/60 px-3 py-1 mb-1">
+        <div className="text-[10px] font-bold uppercase tracking-wider text-muted px-3 py-1 mb-1">
           Patient Portal
         </div>
         {NAV_ITEMS.map((item) => (
@@ -69,14 +79,38 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         ))}
       </nav>
       
+      {/* Bottom Section with Wellness Card & Profile */}
       <div className="sidebar-footer">
-        <div className="flex items-center justify-between text-xs text-muted mb-2">
-          <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
-            <ShieldCheck size={14} /> HIPAA-Ready
-          </span>
-          <span className="text-[11px] bg-slate-800/80 px-2 py-0.5 rounded text-slate-400 border border-white/5">v1.2.0</span>
+        {/* Attractive Wellness Check-In Card */}
+        <div className="sidebar-wellness-card">
+          <div className="flex items-center gap-2 mb-1.5">
+            <div className="p-1 rounded-full bg-white text-emerald">
+              <Sparkles size={13} />
+            </div>
+            <span className="text-xs font-bold text-forest">Daily Recovery Care</span>
+          </div>
+          <p className="text-[11px] text-forest/80 leading-snug mb-2.5">
+            Track your recovery milestones & daily adherence score.
+          </p>
+          <NavLink 
+            to="/daily-care" 
+            onClick={onClose}
+            className="inline-flex items-center gap-1 text-[11px] font-bold text-forest hover:text-emerald transition-colors"
+          >
+            Log Symptoms <ArrowUpRight size={12} />
+          </NavLink>
         </div>
-        <p className="text-[11px] text-muted/60 leading-tight">Continuous Care System</p>
+
+        {/* User Mini Bar */}
+        <div className="flex items-center gap-3 pt-2 px-1">
+          <div className="w-9 h-9 rounded-full bg-forest-green text-soft-mint flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+            {(user?.name || 'Aarushi').split(' ').map((n: string) => n[0]).join('').substring(0, 2)}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold text-charcoal truncate">{user?.name || 'Aarushi Thakur'}</p>
+            <p className="text-[10px] text-muted truncate capitalize">{user?.role || 'Patient'}</p>
+          </div>
+        </div>
       </div>
     </aside>
   );
