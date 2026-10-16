@@ -7,7 +7,7 @@ const router = Router();
 // Uses query params for patient context (e.g. ?patientId=123)
 router.get('/appointments', authenticateToken, authorizeRoles('PATIENT', 'CAREGIVER', 'CLINICIAN'), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const patientId = req.query.patientId || (req as any).user?.id;
+    const patientId = req.query.patientId || req.query.patient_id || (req as any).user?.id;
     const userId = (req as any).user?.id;
     const userRole = (req as any).user?.role;
 
@@ -33,7 +33,7 @@ router.get('/appointments', authenticateToken, authorizeRoles('PATIENT', 'CAREGI
 
 router.get('/tests', authenticateToken, authorizeRoles('PATIENT', 'CAREGIVER', 'CLINICIAN'), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const patientId = req.query.patientId || (req as any).user?.id;
+    const patientId = req.query.patientId || req.query.patient_id || (req as any).user?.id;
     const userId = (req as any).user?.id;
     const userRole = (req as any).user?.role;
 

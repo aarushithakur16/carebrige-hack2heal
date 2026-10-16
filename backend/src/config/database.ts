@@ -57,7 +57,32 @@ const memoryStore = {
   patients: [
     { id: 'p-1', user_id: 'p-1', basic_profile: 'Post-op recovery', consent_status: true }
   ],
-  documents: [] as any[],
+  documents: [
+    {
+      id: 'doc-1',
+      patient_id: 'p-1',
+      file_path: 'uploads/sample_discharge_summary.pdf',
+      document_type: 'Discharge Summary',
+      upload_time: new Date().toISOString(),
+      status: 'draft_extracted',
+      draft_extraction: JSON.stringify({
+        medicines: [
+          { name: 'Amoxicillin', dose_text: '500mg', doseText: '500mg', frequency: 'Twice daily', timing: 'Morning and evening with meals' },
+          { name: 'Ibuprofen', dose_text: '400mg', doseText: '400mg', frequency: 'Every 8 hours as needed', timing: 'After meals for pain control' }
+        ],
+        appointments: [
+          { date: '2026-10-22', department: 'Cardiology Follow-Up' }
+        ],
+        tests: [
+          { test_name: 'Complete Blood Count (CBC)', due_date: '2026-10-18' },
+          { test_name: 'Chest X-Ray', due_date: '2026-10-24' }
+        ],
+        care_instructions: [
+          { instruction: 'Keep surgical incision site dry. Avoid lifting heavy objects (>10 lbs) for 7 days.' }
+        ]
+      })
+    }
+  ] as any[],
   medications: [
     {
       id: 'med-1',
@@ -282,6 +307,15 @@ export const query = async (text: string, params: any[] = []): Promise<{ rows: a
   if (upper.startsWith('SELECT * FROM DOCUMENTS WHERE ID = $1')) {
     const doc = memoryStore.documents.find(d => d.id === params[0]);
     return { rows: doc ? [doc] : [], rowCount: doc ? 1 : 0 };
+  }
+
+  if (upper.includes('FROM DOCUMENTS WHERE PATIENT_ID = $1')) {
+    const docs = memoryStore.documents.filter(d => !d.patient_id || d.patient_id === params[0]);
+    return { rows: docs, rowCount: docs.length };
+  }
+
+  if (upper.includes('FROM DOCUMENTS')) {
+    return { rows: memoryStore.documents, rowCount: memoryStore.documents.length };
   }
 
   if (upper.includes('UPDATE DOCUMENTS SET DRAFT_EXTRACTION = $1')) {

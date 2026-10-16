@@ -32,6 +32,49 @@ const upload = multer({
   }
 });
 
+// List documents
+router.get('/', authenticateToken, authorizeRoles('PATIENT', 'CAREGIVER', 'CLINICIAN'), async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+    const userRole = (req as any).user?.role;
+    
+    let docs;
+    if (userRole === 'CLINICIAN') {
+      docs = await query('SELECT * FROM documents ORDER BY upload_time DESC');
+    } else {
+      docs = await query('SELECT * FROM documents WHERE patient_id = $1 ORDER BY upload_time DESC', [userId]);
+    }
+    return res.status(200).json(docs.rows);
+  } catch (error: any) {
+    console.error('Fetch documents error:', error);
+    return res.status(500).json({ error: 'Failed to fetch documents.' });
+  }
+});
+
+// Get document by ID
+router.get('/:id', authenticateToken, authorizeRoles('PATIENT', 'CAREGIVER', 'CLINICIAN'), async (req: Request, res: Response) => {
+  try {
+    const docId = req.params.id;
+    const userId = (req as any).user?.id;
+    const userRole = (req as any).user?.role;
+
+    const docResult = await query('SELECT * FROM documents WHERE id = $1', [docId]);
+    if (docResult.rowCount === 0) {
+      return res.status(404).json({ error: 'Document not found.' });
+    }
+    const document = docResult.rows[0];
+
+    if (userRole === 'PATIENT' && document.patient_id && document.patient_id !== userId) {
+      return res.status(403).json({ error: 'Unauthorized access to document.' });
+    }
+
+    return res.status(200).json(document);
+  } catch (error: any) {
+    console.error('Get document error:', error);
+    return res.status(500).json({ error: 'Failed to retrieve document.' });
+  }
+});
+
 // 1. Upload Document
 router.post('/upload', authenticateToken, authorizeRoles('PATIENT', 'CLINICIAN'), upload.single('document'), async (req: Request, res: Response) => {
   try {
