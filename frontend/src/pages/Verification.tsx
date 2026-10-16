@@ -10,8 +10,7 @@ import {
   Trash2, 
   Sparkles, 
   ShieldCheck, 
-  ArrowRight,
-  AlertCircle
+  ArrowRight
 } from 'lucide-react';
 import { verifyExtraction } from '../services/documentService';
 
@@ -89,7 +88,6 @@ export const Verification: React.FC = () => {
       setTimeout(() => navigate('/medications'), 2000);
     } catch (err) {
       console.warn('Real API verification fallback:', err);
-      // Offline fallback: ensure user workflow completes smoothly
       setStatus('success');
       setTimeout(() => navigate('/medications'), 2000);
     } finally {
@@ -102,11 +100,11 @@ export const Verification: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-pale-sage text-forest border border-emerald/20 flex items-center gap-1.5">
-              <Sparkles size={13} className="text-emerald" /> Human-in-the-Loop Review
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#EDE9FE] text-[#5B21B6] border border-[#C4B5FD]/40 flex items-center gap-1.5">
+              <Sparkles size={13} className="text-[#5B21B6]" /> Human-in-the-Loop Review
             </span>
             <span className="text-xs text-muted flex items-center gap-1">
-              <ShieldCheck size={13} className="text-emerald" /> Pre-Care Plan Staging
+              <ShieldCheck size={13} className="text-[#166534]" /> Pre-Care Plan Staging
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-charcoal tracking-tight">Review & Verify Extracted Plan</h1>
@@ -117,15 +115,15 @@ export const Verification: React.FC = () => {
       </div>
 
       {status === 'success' ? (
-        <div className="p-8 sm:p-12 text-center bg-pale-sage/70 border border-emerald/30 rounded-[26px] animate-fade-in shadow-card space-y-4">
-          <div className="inline-flex p-4 rounded-full bg-soft-mint text-forest shadow-sm">
+        <div className="p-8 sm:p-12 text-center bg-[#DCFCE7]/60 border border-[#86EFAC]/50 rounded-[26px] animate-fade-in shadow-card space-y-4">
+          <div className="inline-flex p-4 rounded-full bg-[#DCFCE7] text-[#166534] shadow-sm">
             <CheckCircle2 size={48} />
           </div>
           <h2 className="text-2xl font-black text-charcoal">Care Plan Successfully Activated!</h2>
           <p className="text-sm text-muted max-w-md mx-auto leading-relaxed">
             All validated medications, tasks, and follow-ups have been merged into your active CareBridge schedule and shared with your care circle.
           </p>
-          <div className="pt-4 flex items-center justify-center gap-2 text-forest text-sm font-bold">
+          <div className="pt-4 flex items-center justify-center gap-2 text-[#166534] text-sm font-bold">
             <span>Redirecting to your active Medications Tracker</span>
             <ArrowRight size={15} className="animate-pulse" />
           </div>
@@ -136,7 +134,7 @@ export const Verification: React.FC = () => {
           <div className="content-card p-6 sm:p-7">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-extrabold text-charcoal flex items-center gap-2">
-                <Pill size={20} className="text-emerald" /> Prescribed Medications ({medicines.length})
+                <Pill size={20} className="text-[#0F172A]" /> Prescribed Medications ({medicines.length})
               </h3>
               <span className="text-xs text-muted font-medium">Review frequency & timing</span>
             </div>
@@ -146,20 +144,20 @@ export const Verification: React.FC = () => {
             ) : (
               <div className="space-y-3">
                 {medicines.map((med: any, idx: number) => (
-                  <div key={idx} className="bg-warm-cream/60 p-4 rounded-2xl border border-border-light flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-emerald/30 transition-all">
+                  <div key={idx} className="bg-[#F8FAFC] p-4 rounded-2xl border border-border-light flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-[#CBD5E1] transition-all">
                     <div>
                       <div className="flex items-center gap-2">
                         <h4 className="font-bold text-base text-charcoal">{med.name}</h4>
-                        <span className="text-xs px-2.5 py-0.5 rounded-full bg-soft-mint text-forest font-bold">
+                        <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#EDE9FE] text-[#5B21B6] border border-[#C4B5FD]/40 font-bold">
                           {med.dose_text || med.doseText}
                         </span>
                       </div>
                       <p className="text-xs text-muted mt-1">
-                        Frequency: <strong>{med.frequency}</strong> • Timing: <span className="text-emerald font-semibold">{med.timing}</span>
+                        Frequency: <strong>{med.frequency}</strong> • Timing: <span className="text-[#0F172A] font-semibold">{med.timing}</span>
                       </p>
                     </div>
                     <div className="flex items-center gap-2 self-end sm:self-auto">
-                      <span className="text-[11px] px-3 py-1 bg-pale-sage text-forest rounded-full font-bold">
+                      <span className="text-[11px] px-3 py-1 bg-[#DCFCE7] text-[#166534] border border-[#86EFAC]/40 rounded-full font-bold">
                         OCR Verified
                       </span>
                       <button 
@@ -182,16 +180,16 @@ export const Verification: React.FC = () => {
             <div className="content-card p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-extrabold text-charcoal flex items-center gap-2">
-                  <Calendar size={18} className="text-emerald" /> Scheduled Consultations ({appointments.length})
+                  <Calendar size={18} className="text-[#0F172A]" /> Scheduled Consultations ({appointments.length})
                 </h3>
               </div>
               <div className="space-y-3">
                 {appointments.map((app: any, idx: number) => (
-                  <div key={idx} className="bg-warm-cream/60 p-3.5 rounded-xl border border-border-light flex items-center justify-between gap-2">
+                  <div key={idx} className="bg-[#FFEDD5]/40 p-3.5 rounded-xl border border-[#FDBA74]/30 flex items-center justify-between gap-2">
                     <div>
                       <p className="font-bold text-sm text-charcoal">{app.department}</p>
                       <p className="text-xs text-muted mt-0.5 flex items-center gap-1">
-                        <Calendar size={12} className="text-emerald" /> {app.date}
+                        <Calendar size={12} className="text-[#9A3412]" /> {app.date}
                       </p>
                     </div>
                     <button 
@@ -210,15 +208,17 @@ export const Verification: React.FC = () => {
             <div className="content-card p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-extrabold text-charcoal flex items-center gap-2">
-                  <Stethoscope size={18} className="text-emerald" /> Diagnostic Orders ({tests.length})
+                  <Stethoscope size={18} className="text-[#0F172A]" /> Diagnostic Orders ({tests.length})
                 </h3>
               </div>
               <div className="space-y-3">
                 {tests.map((test: any, idx: number) => (
-                  <div key={idx} className="bg-warm-cream/60 p-3.5 rounded-xl border border-border-light flex items-center justify-between gap-2">
+                  <div key={idx} className="bg-[#E0F2FE]/40 p-3.5 rounded-xl border border-[#7DD3FC]/30 flex items-center justify-between gap-2">
                     <div>
                       <p className="font-bold text-sm text-charcoal">{test.test_name || test.testName}</p>
-                      <p className="text-xs text-muted mt-0.5">Due Date: {test.due_date || test.dueDate}</p>
+                      <p className="text-xs text-muted mt-0.5 flex items-center gap-1">
+                        <Calendar size={12} className="text-[#0369A1]" /> Due: {test.due_date || test.dueDate}
+                      </p>
                     </div>
                     <button 
                       onClick={() => removeTest(idx)}
@@ -234,47 +234,41 @@ export const Verification: React.FC = () => {
           </div>
 
           {/* Care Instructions */}
-          {instructions.length > 0 && (
-            <div className="content-card p-6">
-              <h3 className="text-sm font-extrabold text-charcoal mb-3 flex items-center gap-2">
-                <ClipboardList size={18} className="text-emerald" /> Specific Care Guidelines & Restrictions
-              </h3>
-              <div className="space-y-2.5">
-                {instructions.map((inst: any, idx: number) => (
-                  <div key={idx} className="p-3 bg-pale-sage/50 border border-emerald/15 rounded-xl text-xs text-forest flex items-start justify-between gap-3">
-                    <p className="leading-relaxed flex-1 font-medium">{inst.instruction || inst.task_text}</p>
-                    <button 
-                      onClick={() => removeInstruction(idx)}
-                      className="text-muted hover:text-rose-600 shrink-0"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                ))}
-              </div>
+          <div className="content-card p-6">
+            <h3 className="text-sm font-extrabold text-charcoal mb-4 flex items-center gap-2">
+              <ClipboardList size={18} className="text-[#0F172A]" /> Recovery Care Directives ({instructions.length})
+            </h3>
+            <div className="space-y-3">
+              {instructions.map((inst: any, idx: number) => (
+                <div key={idx} className="bg-[#FEF9C3]/40 p-3.5 rounded-xl border border-[#FDE047]/30 flex items-start justify-between gap-2">
+                  <p className="text-xs text-charcoal font-medium leading-relaxed">
+                    {inst.instruction || inst.task_text}
+                  </p>
+                  <button 
+                    onClick={() => removeInstruction(idx)}
+                    className="p-1.5 text-muted hover:text-rose-600 rounded-lg shrink-0"
+                    title="Remove instruction"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              ))}
             </div>
-          )}
+          </div>
 
           {/* Action Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-border-medium">
-            <div className="text-xs text-muted flex items-center gap-1.5">
-              <AlertCircle size={14} className="text-emerald" />
-              <span>Items confirmed here immediately become active and alert-enabled in CareBridge.</span>
-            </div>
-
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <Button variant="ghost" className="w-full sm:w-auto" onClick={() => navigate('/documents')}>
-                Cancel Review
-              </Button>
-              <Button 
-                onClick={handleVerify} 
-                isLoading={verifying} 
-                icon={CheckCircle2}
-                className="w-full sm:w-auto"
-              >
-                Promote to Active Care Plan
-              </Button>
-            </div>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-border-light">
+            <Button variant="ghost" onClick={() => navigate('/documents')}>
+              Back to Uploader
+            </Button>
+            <Button 
+              onClick={handleVerify} 
+              isLoading={verifying}
+              icon={CheckCircle2}
+              className="w-full sm:w-auto"
+            >
+              Approve & Activate Care Plan
+            </Button>
           </div>
         </div>
       )}

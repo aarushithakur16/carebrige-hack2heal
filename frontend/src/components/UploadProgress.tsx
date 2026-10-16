@@ -15,22 +15,22 @@ export const UploadProgress: React.FC<UploadProgressProps> = ({ progress, status
   return (
     <div className="w-full mt-4 space-y-3">
       <div className="flex justify-between items-center text-xs">
-        <span className="font-bold text-forest flex items-center gap-1.5">
+        <span className="font-bold text-[#0F172A] flex items-center gap-1.5">
           {status === 'Extraction Ready' ? (
-            <Sparkles size={14} className="text-emerald" />
+            <Sparkles size={14} className="text-[#166534]" />
           ) : (
-            <Loader2 size={14} className="animate-spin text-emerald" />
+            <Loader2 size={14} className="animate-spin text-[#0F172A]" />
           )}
           {status === 'Uploading' && 'Uploading document to encrypted repository...'}
           {status === 'Processing' && 'Running intelligent OCR & parsing medical entities...'}
           {status === 'Extraction Ready' && 'Clinical entity extraction complete & validated'}
         </span>
-        <span className="font-extrabold text-forest bg-pale-sage px-2.5 py-0.5 rounded-full border border-emerald/20">{progress}%</span>
+        <span className="font-extrabold text-[#0F172A] bg-[#F1F5F9] px-2.5 py-0.5 rounded-full border border-[#E2E8F0]">{progress}%</span>
       </div>
 
-      <div className="w-full bg-pale-sage rounded-full h-2 overflow-hidden border border-emerald/10">
+      <div className="w-full bg-[#E2E8F0] rounded-full h-2 overflow-hidden">
         <div 
-          className="bg-gradient-to-r from-forest-green to-emerald h-2 rounded-full transition-all duration-300 shadow-sm" 
+          className="bg-[#0F172A] h-2 rounded-full transition-all duration-300 shadow-sm" 
           style={{ width: `${progress}%` }}
         ></div>
       </div>
@@ -44,14 +44,14 @@ export const UploadProgress: React.FC<UploadProgressProps> = ({ progress, status
               key={s.label} 
               className={`p-2 rounded-xl border text-center transition-all ${
                 isDone 
-                  ? 'bg-soft-mint/60 border-emerald/20 text-forest font-bold' 
+                  ? 'bg-[#DCFCE7] border-[#86EFAC]/40 text-[#166534] font-bold' 
                   : isCurrent 
-                    ? 'bg-pale-sage border-emerald/40 text-forest font-bold' 
-                    : 'bg-warm-cream border-border-light text-muted'
+                    ? 'bg-[#F1F5F9] border-[#0F172A] text-[#0F172A] font-bold' 
+                    : 'bg-[#F8FAFC] border-[#E2E8F0] text-muted'
               }`}
             >
               <div className="text-[10px] flex items-center justify-center gap-1">
-                {isDone ? <CheckCircle2 size={11} className="text-emerald" /> : null}
+                {isDone ? <CheckCircle2 size={11} className="text-[#166534]" /> : null}
                 <span>{s.label}</span>
               </div>
             </div>

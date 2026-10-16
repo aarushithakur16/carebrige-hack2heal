@@ -43,8 +43,8 @@ export const PendingTests: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-pale-sage text-forest border border-emerald/20 flex items-center gap-1.5">
-              <Sparkles size={13} className="text-emerald" /> Diagnostic Orders
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#E0F2FE] text-[#0369A1] border border-[#7DD3FC]/40 flex items-center gap-1.5">
+              <Sparkles size={13} className="text-[#0369A1]" /> Diagnostic Orders
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-charcoal tracking-tight">Ordered Clinical Tests</h1>
@@ -58,7 +58,7 @@ export const PendingTests: React.FC = () => {
         <div className="p-12 text-center text-muted animate-pulse">Loading diagnostic test orders...</div>
       ) : tests.length === 0 ? (
         <div className="content-card p-8 text-center text-muted">
-          <Stethoscope size={32} className="mx-auto text-emerald mb-2 opacity-60" />
+          <Stethoscope size={32} className="mx-auto text-[#0F172A] mb-2 opacity-60" />
           <p className="text-sm font-semibold">No diagnostic tests currently pending.</p>
         </div>
       ) : (
@@ -70,8 +70,8 @@ export const PendingTests: React.FC = () => {
                 <div className="flex items-start gap-4">
                   <div className={`p-3 rounded-2xl shrink-0 ${
                     isScheduled 
-                      ? 'bg-soft-mint text-forest' 
-                      : 'bg-pale-sage text-forest'
+                      ? 'bg-[#DCFCE7] text-[#166534]' 
+                      : 'bg-[#E0F2FE] text-[#0369A1]'
                   }`}>
                     <Stethoscope size={24} />
                   </div>
@@ -85,7 +85,7 @@ export const PendingTests: React.FC = () => {
                     </div>
                     <div className="flex flex-wrap items-center gap-3 text-xs text-muted mt-1.5">
                       <span className="flex items-center gap-1 font-semibold text-charcoal">
-                        <Calendar size={13} className="text-emerald" /> Due: {test.dueDate || (test as any).due_date}
+                        <Calendar size={13} className="text-[#64748B]" /> Due: {test.dueDate || (test as any).due_date}
                       </span>
                       <span>•</span>
                       <span>Lab Preparation: Fasting 8 hrs prior recommended</span>
@@ -95,8 +95,8 @@ export const PendingTests: React.FC = () => {
 
                 <div className="w-full sm:w-auto">
                   {isScheduled ? (
-                    <div className="flex items-center gap-2 text-forest bg-soft-mint px-4 py-2 rounded-full text-xs font-bold">
-                      <CheckCircle2 size={16} className="text-emerald" /> Scheduled at Lab
+                    <div className="flex items-center gap-2 text-[#166534] bg-[#DCFCE7] border border-[#86EFAC]/40 px-4 py-2 rounded-full text-xs font-bold">
+                      <CheckCircle2 size={16} className="text-[#166534]" /> Scheduled at Lab
                     </div>
                   ) : (
                     <Button 

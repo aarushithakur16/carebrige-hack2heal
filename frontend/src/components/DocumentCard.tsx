@@ -22,11 +22,11 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ file, progress, stat
   };
 
   return (
-    <Card className="p-5 border-emerald/25 bg-white relative overflow-hidden shadow-card rounded-[22px]">
+    <Card className="p-5 border-[#E2E8F0] bg-white relative overflow-hidden shadow-card rounded-[22px]">
       <div className="flex items-start gap-4">
-        <div className="p-3 bg-soft-mint text-forest rounded-xl shrink-0">
+        <div className="p-3 bg-[#EDE9FE] text-[#5B21B6] rounded-xl shrink-0 border border-[#C4B5FD]/40">
           {status === 'Extraction Ready' ? (
-            <FileCheck size={26} className="text-forest" />
+            <FileCheck size={26} className="text-[#5B21B6]" />
           ) : isImage ? (
             <Image size={26} />
           ) : (

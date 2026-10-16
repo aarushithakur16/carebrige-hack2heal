@@ -22,3 +22,18 @@ export const submitCheckin = async (taskId: string, status: string, note: string
     body: JSON.stringify({ patientId: user?.id, taskId: taskId || undefined, status: status || 'completed', note, timestamp: new Date().toISOString() }),
   });
 };
+
+export const logCheckin = async (painLevel: number, symptoms: string[], notes: string): Promise<any> => {
+  const user = getAuthUser();
+  return await apiFetch(`/checkins`, {
+    method: 'POST',
+    body: JSON.stringify({
+      patientId: user?.id,
+      painLevel,
+      symptoms,
+      note: notes,
+      status: 'completed',
+      timestamp: new Date().toISOString()
+    }),
+  });
+};

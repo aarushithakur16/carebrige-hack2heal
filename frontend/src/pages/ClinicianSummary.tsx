@@ -10,7 +10,7 @@ import {
   UserCheck, 
   Copy, 
   Check, 
-  TrendingUp,
+  TrendingUp, 
   Stethoscope,
   Clock,
   ShieldCheck
@@ -83,11 +83,11 @@ Verified via CareBridge AI Healthcare Continuity Engine`;
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-pale-sage text-forest border border-emerald/20 flex items-center gap-1.5">
-              <Stethoscope size={13} className="text-emerald" /> Physician & Care Team Review
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#E0F2FE] text-[#0369A1] border border-[#7DD3FC]/40 flex items-center gap-1.5">
+              <Stethoscope size={13} className="text-[#0369A1]" /> Physician & Care Team Review
             </span>
             <span className="text-xs text-muted flex items-center gap-1">
-              <ShieldCheck size={13} className="text-emerald" /> Non-Diagnostic Algorithmic Synthesis
+              <ShieldCheck size={13} className="text-[#166534]" /> Non-Diagnostic Algorithmic Synthesis
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-charcoal tracking-tight">Clinician Follow-Up Summary</h1>
@@ -108,8 +108,8 @@ Verified via CareBridge AI Healthcare Continuity Engine`;
 
       {/* Role Banner */}
       {!isClinician && (
-        <div className="bg-pale-sage/70 border border-emerald/20 p-4 rounded-2xl flex items-center gap-3 text-forest text-xs font-medium">
-          <UserCheck size={18} className="shrink-0 text-emerald" />
+        <div className="bg-[#F8FAFC] border border-[#E2E8F0] p-4 rounded-2xl flex items-center gap-3 text-charcoal text-xs font-medium">
+          <UserCheck size={18} className="shrink-0 text-[#0F172A]" />
           <p>
             <strong>Provider View Mode:</strong> You are viewing the clinical summary prepared for your physician. It synthesizes all daily check-ins and medication records.
           </p>
@@ -117,41 +117,41 @@ Verified via CareBridge AI Healthcare Continuity Engine`;
       )}
 
       {/* Clinical Disclaimer */}
-      <div className="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex gap-3 text-amber-900 text-xs">
-        <AlertTriangle size={18} className="shrink-0 text-amber-600" />
+      <div className="bg-[#FEF9C3]/50 border border-[#FDE047]/40 p-4 rounded-2xl flex gap-3 text-[#854D0E] text-xs">
+        <AlertTriangle size={18} className="shrink-0 text-[#854D0E]" />
         <p className="leading-relaxed">
           <strong>Clinical Decision Support Disclaimer:</strong> CareBridge summarizes patient-reported and verified records. It does not provide medical diagnoses or prescribe pharmacotherapy. Review is intended to assist, not replace, clinical judgment.
         </p>
       </div>
 
-      {/* 4 Metric Cards */}
+      {/* 4 Coordinated Pastel Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="content-card p-5 shadow-card">
           <p className="text-[11px] text-muted font-bold uppercase tracking-wider">Monitoring Window</p>
           <p className="text-2xl font-black text-charcoal mt-1.5">{summary.carePeriod}</p>
-          <p className="text-xs text-emerald mt-1 flex items-center gap-1 font-semibold">
+          <p className="text-xs text-[#0F172A] mt-1 flex items-center gap-1 font-semibold">
             <Clock size={12} /> Live tracking
           </p>
         </div>
 
         <div className="card-mint p-5 rounded-[22px] shadow-card">
-          <p className="text-[11px] text-forest/80 font-bold uppercase tracking-wider">Adherence Score</p>
-          <p className="text-2xl font-black text-forest mt-1.5">{summary.adherenceScore}%</p>
-          <p className="text-xs text-forest/80 mt-1 flex items-center gap-1 font-semibold">
+          <p className="text-[11px] text-[#166534] font-bold uppercase tracking-wider">Adherence Score</p>
+          <p className="text-2xl font-black text-[#166534] mt-1.5">{summary.adherenceScore}%</p>
+          <p className="text-xs text-[#166534] mt-1 flex items-center gap-1 font-semibold">
             <TrendingUp size={12} /> Within clinical target (&gt;80%)
           </p>
         </div>
 
         <div className="card-lavender p-5 rounded-[22px] shadow-card">
-          <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#382856', opacity: 0.8 }}>Completed Tasks</p>
-          <p className="text-2xl font-black mt-1.5" style={{ color: '#382856' }}>{summary.completedTasks}</p>
-          <p className="text-xs mt-1 font-semibold" style={{ color: '#382856', opacity: 0.8 }}>Care activities confirmed</p>
+          <p className="text-[11px] text-[#5B21B6] font-bold uppercase tracking-wider">Completed Tasks</p>
+          <p className="text-2xl font-black text-[#5B21B6] mt-1.5">{summary.completedTasks}</p>
+          <p className="text-xs text-[#5B21B6] mt-1 font-semibold">Care activities confirmed</p>
         </div>
 
         <div className="card-peach p-5 rounded-[22px] shadow-card">
-          <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#5A2C18', opacity: 0.8 }}>Missed / Delayed</p>
-          <p className="text-2xl font-black mt-1.5" style={{ color: '#5A2C18' }}>{summary.missedTasks + summary.delayedTasks}</p>
-          <p className="text-xs mt-1 font-semibold" style={{ color: '#5A2C18', opacity: 0.8 }}>{summary.missedTasks} missed, {summary.delayedTasks} delayed</p>
+          <p className="text-[11px] text-[#9A3412] font-bold uppercase tracking-wider">Missed / Delayed</p>
+          <p className="text-2xl font-black text-[#9A3412] mt-1.5">{summary.missedTasks + summary.delayedTasks}</p>
+          <p className="text-xs text-[#9A3412] mt-1 font-semibold">{summary.missedTasks} missed, {summary.delayedTasks} delayed</p>
         </div>
       </div>
 
@@ -159,7 +159,7 @@ Verified via CareBridge AI Healthcare Continuity Engine`;
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="content-card p-6 sm:p-7 shadow-card">
           <h3 className="text-base font-extrabold text-charcoal mb-4 flex items-center gap-2">
-            <ActivitySquare size={18} className="text-emerald" /> Clinical Metric Breakdown
+            <ActivitySquare size={18} className="text-[#0F172A]" /> Clinical Metric Breakdown
           </h3>
           <div className="space-y-3.5 text-xs">
             <div className="flex justify-between items-center border-b border-border-light pb-2.5">
@@ -176,11 +176,11 @@ Verified via CareBridge AI Healthcare Continuity Engine`;
             </div>
             <div className="flex justify-between items-center border-b border-border-light pb-2.5">
               <span className="text-muted">Medication Course Adherence</span>
-              <span className="font-bold text-forest">92% On-Schedule</span>
+              <span className="font-bold text-[#166534]">92% On-Schedule</span>
             </div>
             <div className="flex justify-between items-center border-b border-border-light pb-2.5">
               <span className="text-muted">Next Scheduled Follow-Up</span>
-              <span className="font-bold text-emerald">Oct 22, 2026 (Cardiology)</span>
+              <span className="font-bold text-[#0F172A]">Oct 22, 2026 (Cardiology)</span>
             </div>
           </div>
         </div>
@@ -188,17 +188,17 @@ Verified via CareBridge AI Healthcare Continuity Engine`;
         <div className="content-card p-6 sm:p-7 shadow-card">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-extrabold text-charcoal flex items-center gap-2">
-              <FileText size={18} className="text-emerald" /> Patient-Reported Observations
+              <FileText size={18} className="text-[#0F172A]" /> Patient-Reported Observations
             </h3>
-            <span className="text-[10px] uppercase font-bold text-muted bg-pale-sage px-2 py-0.5 rounded-full">Algorithmic NLP</span>
+            <span className="text-[10px] uppercase font-bold text-[#0F172A] bg-[#F1F5F9] px-2 py-0.5 rounded-full border border-[#E2E8F0]">Algorithmic NLP</span>
           </div>
 
-          <div className="bg-warm-cream/70 p-4 rounded-2xl text-xs leading-relaxed border border-border-light text-charcoal min-h-[140px]">
+          <div className="bg-[#F8FAFC] p-4 rounded-2xl text-xs leading-relaxed border border-border-light text-charcoal min-h-[140px]">
             {summary.notes || "No patient notes reported during this monitoring period."}
           </div>
           
-          <div className="mt-5 flex items-center gap-2 text-forest text-xs font-bold">
-            <CheckCircle2 size={16} className="text-emerald" /> Timeline synthesized against discharge protocol
+          <div className="mt-5 flex items-center gap-2 text-[#166534] text-xs font-bold">
+            <CheckCircle2 size={16} className="text-[#166534]" /> Timeline synthesized against discharge protocol
           </div>
         </div>
       </div>

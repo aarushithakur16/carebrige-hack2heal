@@ -84,18 +84,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         {/* Attractive Wellness Check-In Card */}
         <div className="sidebar-wellness-card">
           <div className="flex items-center gap-2 mb-1.5">
-            <div className="p-1 rounded-full bg-white text-emerald">
+            <div className="p-1 rounded-full bg-white text-[#166534] shadow-xs">
               <Sparkles size={13} />
             </div>
-            <span className="text-xs font-bold text-forest">Daily Recovery Care</span>
+            <span className="text-xs font-bold text-[#166534]">Daily Recovery Care</span>
           </div>
-          <p className="text-[11px] text-forest/80 leading-snug mb-2.5">
+          <p className="text-[11px] text-[#166534]/80 leading-snug mb-2.5">
             Track your recovery milestones & daily adherence score.
           </p>
           <NavLink 
             to="/daily-care" 
             onClick={onClose}
-            className="inline-flex items-center gap-1 text-[11px] font-bold text-forest hover:text-emerald transition-colors"
+            className="inline-flex items-center gap-1 text-[11px] font-bold text-[#166534] hover:underline transition-colors"
           >
             Log Symptoms <ArrowUpRight size={12} />
           </NavLink>
@@ -103,7 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
         {/* User Mini Bar */}
         <div className="flex items-center gap-3 pt-2 px-1">
-          <div className="w-9 h-9 rounded-full bg-forest-green text-soft-mint flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+          <div className="w-9 h-9 rounded-full bg-[#0F172A] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
             {(user?.name || 'Aarushi').split(' ').map((n: string) => n[0]).join('').substring(0, 2)}
           </div>
           <div className="min-w-0 flex-1">

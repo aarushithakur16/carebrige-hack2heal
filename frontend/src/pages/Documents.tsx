@@ -28,11 +28,11 @@ export const Documents: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-pale-sage text-forest border border-emerald/20 flex items-center gap-1.5">
-              <Sparkles size={12} className="text-emerald" /> OCR & NLP Entity Extraction
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#EDE9FE] text-[#5B21B6] border border-[#C4B5FD]/40 flex items-center gap-1.5">
+              <Sparkles size={12} className="text-[#5B21B6]" /> OCR & NLP Entity Extraction
             </span>
             <span className="text-xs text-muted flex items-center gap-1">
-              <ShieldCheck size={13} className="text-emerald" /> HIPAA Redaction Engine Active
+              <ShieldCheck size={13} className="text-[#166534]" /> HIPAA Redaction Engine Active
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-charcoal tracking-tight">Clinical Document Ingestion</h1>
@@ -51,7 +51,7 @@ export const Documents: React.FC = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-extrabold text-charcoal flex items-center gap-2">
-            <Clock size={18} className="text-emerald" /> Ingestion History & Promoted Records
+            <Clock size={18} className="text-[#0F172A]" /> Ingestion History & Promoted Records
           </h2>
           <span className="text-xs text-muted font-medium">2 Documents Active</span>
         </div>
@@ -60,7 +60,7 @@ export const Documents: React.FC = () => {
           {recentDocuments.map(doc => (
             <Card key={doc.id} className="p-4 flex items-center justify-between hover-lift">
               <div className="flex items-center gap-3.5 min-w-0">
-                <div className="p-2.5 bg-pale-sage text-forest rounded-xl border border-emerald/20 shrink-0">
+                <div className="p-2.5 bg-[#F1F5F9] text-[#0F172A] rounded-xl border border-[#E2E8F0] shrink-0">
                   <FileText size={22} />
                 </div>
                 <div className="min-w-0 pr-2">

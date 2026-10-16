@@ -153,8 +153,8 @@ export const DocumentUploader: React.FC = () => {
                 onClick={() => setDocumentType(type)}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
                   documentType === type
-                    ? 'bg-forest-green text-soft-mint shadow-sm'
-                    : 'bg-pale-sage/60 text-charcoal hover:bg-pale-sage'
+                    ? 'bg-[#0F172A] text-white shadow-sm'
+                    : 'bg-[#F1F5F9] text-[#334155] hover:bg-[#E2E8F0] border border-[#E2E8F0]'
                 }`}
               >
                 {type}
@@ -168,9 +168,9 @@ export const DocumentUploader: React.FC = () => {
           <button
             type="button"
             onClick={handleLoadSampleDocument}
-            className="flex items-center gap-1.5 text-xs text-forest hover:text-emerald bg-soft-mint hover:bg-pale-sage px-3.5 py-2 rounded-full transition-all self-end sm:self-auto font-bold shadow-sm"
+            className="flex items-center gap-1.5 text-xs text-[#166534] bg-[#DCFCE7] hover:bg-[#BBF7D0] px-3.5 py-2 rounded-full transition-all self-end sm:self-auto font-bold border border-[#86EFAC]/50 shadow-sm"
           >
-            <Sparkles size={14} className="text-emerald" /> 1-Click Load Sample Note
+            <Sparkles size={14} className="text-[#166534]" /> 1-Click Load Sample Note
           </button>
         )}
       </div>
@@ -186,8 +186,8 @@ export const DocumentUploader: React.FC = () => {
         <div 
           className={`border-2 border-dashed rounded-[22px] p-10 sm:p-14 text-center transition-all cursor-pointer ${
             isDragging 
-              ? 'border-emerald bg-soft-mint/30 scale-[1.01]' 
-              : 'border-emerald/30 bg-warm-cream/40 hover:border-emerald hover:bg-pale-sage/30'
+              ? 'border-[#0F172A] bg-[#F1F5F9] scale-[1.01]' 
+              : 'border-[#CBD5E1] bg-[#F8FAFC] hover:border-[#0F172A] hover:bg-[#F1F5F9]'
           }`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -195,7 +195,7 @@ export const DocumentUploader: React.FC = () => {
           onClick={() => fileInputRef.current?.click()}
         >
           <div className="flex justify-center mb-4">
-            <div className="p-4 bg-soft-mint text-forest rounded-2xl shadow-sm">
+            <div className="p-4 bg-[#EDE9FE] text-[#5B21B6] rounded-2xl shadow-sm border border-[#C4B5FD]/40">
               <UploadCloud size={44} />
             </div>
           </div>
@@ -224,7 +224,7 @@ export const DocumentUploader: React.FC = () => {
           </div>
 
           <div className="mt-6 pt-5 border-t border-border-light flex items-center justify-center gap-2 text-[11px] text-muted">
-            <ShieldCheck size={14} className="text-emerald" />
+            <ShieldCheck size={14} className="text-[#166534]" />
             <span>Strict Client-Side Encryption & HIPAA Pipeline Active</span>
           </div>
         </div>
@@ -247,8 +247,8 @@ export const DocumentUploader: React.FC = () => {
           )}
           
           {uploadStatus === 'Extraction Ready' && (
-            <div className="p-7 bg-pale-sage/60 border border-emerald/25 rounded-[22px] text-center space-y-4 animate-fade-in shadow-md">
-              <div className="inline-flex p-3 rounded-full bg-soft-mint text-forest shadow-sm">
+            <div className="p-7 bg-[#DCFCE7]/50 border border-[#86EFAC]/50 rounded-[22px] text-center space-y-4 animate-fade-in shadow-sm">
+              <div className="inline-flex p-3 rounded-full bg-[#DCFCE7] text-[#166534] shadow-sm">
                 <FileCheck size={32} />
               </div>
               <div>

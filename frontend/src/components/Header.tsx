@@ -84,7 +84,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar, isSidebarOpen }
 
         {/* Date Indicator */}
         <div className="date-pill hidden lg:flex">
-          <Calendar size={14} className="text-emerald" />
+          <Calendar size={14} className="text-[#0F172A]" />
           <span>{todayFormatted}</span>
         </div>
 
@@ -100,17 +100,17 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar, isSidebarOpen }
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 top-12 w-80 bg-white border border-border-medium rounded-2xl shadow-xl p-4 z-50 animate-fade-in">
-              <div className="flex items-center justify-between pb-2 border-b border-border-light mb-3">
+            <div className="absolute right-0 top-12 w-80 bg-white border border-[#E2E8F0] rounded-2xl shadow-xl p-4 z-50 animate-fade-in">
+              <div className="flex items-center justify-between pb-2 border-b border-[#E2E8F0] mb-3">
                 <span className="text-xs font-bold text-charcoal">Clinical Notifications</span>
-                <span className="text-[10px] bg-pale-sage text-forest px-2 py-0.5 rounded-full font-bold">2 New</span>
+                <span className="text-[10px] bg-[#DCFCE7] text-[#166534] border border-[#86EFAC]/40 px-2 py-0.5 rounded-full font-bold">2 New</span>
               </div>
               <div className="space-y-2.5 text-xs">
-                <div className="p-2.5 rounded-xl bg-pale-sage/50 border border-emerald/10">
+                <div className="p-2.5 rounded-xl bg-[#DCFCE7]/40 border border-[#86EFAC]/40">
                   <p className="font-semibold text-charcoal">Medication Reminder</p>
                   <p className="text-[11px] text-muted mt-0.5">Amoxicillin 500mg due with dinner (08:00 PM).</p>
                 </div>
-                <div className="p-2.5 rounded-xl bg-soft-peach/40 border border-peach/20">
+                <div className="p-2.5 rounded-xl bg-[#FFEDD5]/40 border border-[#FDBA74]/40">
                   <p className="font-semibold text-charcoal">Upcoming Consultation</p>
                   <p className="text-[11px] text-muted mt-0.5">Cardiology Follow-Up with Dr. Jenkins in 3 days.</p>
                 </div>

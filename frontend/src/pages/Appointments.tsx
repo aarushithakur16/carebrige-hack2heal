@@ -61,8 +61,8 @@ export const Appointments: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-pale-sage text-forest border border-emerald/20 flex items-center gap-1.5">
-              <Sparkles size={13} className="text-emerald" /> Continuous Care Calendar
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#FFEDD5] text-[#9A3412] border border-[#FDBA74]/40 flex items-center gap-1.5">
+              <Sparkles size={13} className="text-[#9A3412]" /> Continuous Care Calendar
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-charcoal tracking-tight">Scheduled Consultations</h1>
@@ -76,7 +76,7 @@ export const Appointments: React.FC = () => {
         <div className="p-12 text-center text-muted animate-pulse">Loading scheduled consultations...</div>
       ) : appointments.length === 0 ? (
         <div className="content-card p-8 text-center text-muted">
-          <CalendarIcon size={32} className="mx-auto text-emerald mb-2 opacity-60" />
+          <CalendarIcon size={32} className="mx-auto text-[#0F172A] mb-2 opacity-60" />
           <p className="text-sm font-semibold">No upcoming appointments scheduled.</p>
         </div>
       ) : (
@@ -90,10 +90,10 @@ export const Appointments: React.FC = () => {
               <div key={app.id} className="content-card p-6 flex flex-col justify-between hover-lift shadow-card">
                 <div>
                   <div className="flex items-start gap-4 mb-4">
-                    {/* Calendar Badge */}
-                    <div className="w-14 h-14 rounded-2xl bg-pale-sage border border-emerald/25 flex flex-col items-center justify-center shrink-0 text-center shadow-sm">
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald">{month}</span>
-                      <span className="text-xl font-black text-forest leading-none">{day}</span>
+                    {/* Calendar Badge: Pastel Peach */}
+                    <div className="w-14 h-14 rounded-2xl bg-[#FFEDD5] border border-[#FDBA74]/40 flex flex-col items-center justify-center shrink-0 text-center shadow-sm">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#9A3412]">{month}</span>
+                      <span className="text-xl font-black text-[#9A3412] leading-none">{day}</span>
                     </div>
 
                     <div className="min-w-0 flex-1">
@@ -101,7 +101,7 @@ export const Appointments: React.FC = () => {
                         {app.doctorName || (app as any).doctor_name || 'Attending Physician'}
                       </h3>
                       <p className="text-xs text-muted truncate mt-0.5">{app.department}</p>
-                      <span className="inline-block mt-2 text-[11px] px-2.5 py-0.5 rounded-full bg-soft-mint text-forest font-bold">
+                      <span className="inline-block mt-2 text-[11px] px-2.5 py-0.5 rounded-full bg-[#F1F5F9] text-[#0F172A] border border-[#E2E8F0] font-bold">
                         Post-Discharge Follow-Up
                       </span>
                     </div>
@@ -109,11 +109,11 @@ export const Appointments: React.FC = () => {
 
                   <div className="space-y-2.5 mt-5 text-xs text-charcoal border-t border-border-light pt-4">
                     <div className="flex items-center gap-2">
-                      <Clock size={15} className="text-emerald shrink-0" />
+                      <Clock size={15} className="text-[#64748B] shrink-0" />
                       <span className="font-semibold">{app.time || '10:00 AM EST'}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <MapPin size={15} className="text-emerald shrink-0" />
+                      <MapPin size={15} className="text-[#64748B] shrink-0" />
                       <span className="truncate text-muted">{app.location || 'Building A, Room 302'}</span>
                     </div>
                   </div>

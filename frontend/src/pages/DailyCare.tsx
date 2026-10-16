@@ -13,17 +13,37 @@ import {
   Activity,
   Check
 } from 'lucide-react';
-import { getTasks, updateTaskStatus, submitCheckin } from '../services/taskService';
+import { getTasks, updateTaskStatus, logCheckin } from '../services/taskService';
 import type { CareTask } from '../types';
 
 export const DailyCare: React.FC = () => {
   const [tasks, setTasks] = useState<CareTask[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showCheckinModal, setShowCheckinModal] = useState(false);
+  
+  // Health Check-in Form States
   const [painLevel, setPainLevel] = useState(2);
   const [symptoms, setSymptoms] = useState('');
-  const [submittingCheckin, setSubmittingCheckin] = useState(false);
+  const [notes, setNotes] = useState('');
+  const [checkinSubmitting, setCheckinSubmitting] = useState(false);
   const [checkinSuccess, setCheckinSuccess] = useState(false);
-  const [loading, setLoading] = useState(true);
+
+  const commonSymptomChips = [
+    'Mild Incision Tenderness',
+    'Normal Energy & Appetite',
+    'Post-Activity Fatigue',
+    'Slight Swelling (Improving)',
+    'Full Knee Extension Reached',
+    'Restful 8-Hour Sleep'
+  ];
+
+  const handleToggleSymptomChip = (chip: string) => {
+    if (symptoms.includes(chip)) {
+      setSymptoms(symptoms.replace(chip, '').replace(/,\s*,/g, ',').replace(/^,\s*|,\s*$/g, '').trim());
+    } else {
+      setSymptoms(symptoms ? `${symptoms}, ${chip}` : chip);
+    }
+  };
 
   useEffect(() => {
     getTasks()
@@ -35,48 +55,36 @@ export const DailyCare: React.FC = () => {
   const toggleTask = async (id: string) => {
     const task = tasks.find(t => t.id === id);
     if (!task) return;
-
     const newStatus = task.status === 'completed' ? 'pending' : 'completed';
+    
     // Optimistic UI update
-    setTasks(tasks.map(t => t.id === id ? { ...t, status: newStatus } : t));
-
+    setTasks(prev => prev.map(t => t.id === id ? { ...t, status: newStatus } : t));
+    
     try {
       await updateTaskStatus(id, newStatus);
     } catch (err) {
-      console.error('Failed to sync task status:', err);
+      console.error('Failed to update task status:', err);
     }
-  };
-
-  const commonSymptomChips = [
-    'Healing cleanly',
-    'Mild incision soreness',
-    'No swelling',
-    'Good appetite',
-    'Walking comfortably',
-    'Mild fatigue'
-  ];
-
-  const handleChipClick = (chip: string) => {
-    setSymptoms(prev => prev ? `${prev}, ${chip}` : chip);
   };
 
   const handleSubmitCheckin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmittingCheckin(true);
+    setCheckinSubmitting(true);
     try {
-      const note = `Reported Pain Level: ${painLevel}/10. Symptoms: ${symptoms || 'Patient reports recovery progressing as expected.'}`;
-      await submitCheckin('', 'completed', note);
+      await logCheckin(painLevel, symptoms ? [symptoms] : [], notes);
       setCheckinSuccess(true);
       setShowCheckinModal(false);
       setSymptoms('');
+      setNotes('');
       setTimeout(() => setCheckinSuccess(false), 4500);
     } catch (err) {
-      console.warn('Real checkin API fallback:', err);
+      console.error('Failed to log checkin:', err);
+      // Fallback feedback for smooth demo
       setCheckinSuccess(true);
       setShowCheckinModal(false);
       setTimeout(() => setCheckinSuccess(false), 4500);
     } finally {
-      setSubmittingCheckin(false);
+      setCheckinSubmitting(false);
     }
   };
 
@@ -84,9 +92,9 @@ export const DailyCare: React.FC = () => {
   const progressPercent = tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
 
   const getPainColor = (lvl: number) => {
-    if (lvl <= 3) return 'text-[#166534] bg-[#DCFCE7] border-[#86EFAC]/40';
-    if (lvl <= 6) return 'text-[#854D0E] bg-[#FEF9C3] border-[#FDE047]/40';
-    return 'text-[#9D174D] bg-[#FCE7F3] border-[#F472B6]/40';
+    if (lvl <= 3) return 'text-[#38420B] bg-[#D9F36A] border-[#D9F36A]';
+    if (lvl <= 6) return 'text-[#4A1D07] bg-[#FFB78B] border-[#FFB78B]';
+    return 'text-[#8C1D18] bg-[#FFD4CC] border-[#FFD4CC]';
   };
 
   const getPainLabel = (lvl: number) => {
@@ -96,21 +104,21 @@ export const DailyCare: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 animate-fade-in pb-12">
+    <div className="max-w-4xl mx-auto space-y-7 animate-fade-in pb-16">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#F1F5F9] text-[#0F172A] border border-[#E2E8F0] flex items-center gap-1.5">
-              <Sparkles size={13} className="text-[#0F172A]" /> Daily Recovery Plan
+            <span className="badge-editorial badge-chartreuse">
+              <Sparkles size={13} /> Daily Recovery Path
             </span>
             <span className="text-xs text-muted flex items-center gap-1">
-              <Activity size={13} className="text-[#0F172A]" /> Patient Reported Outcomes (PRO)
+              <Activity size={13} className="text-[#30253D]" /> Patient Reported Outcomes (PRO)
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-charcoal tracking-tight">Daily Care & Symptom Check-In</h1>
-          <p className="text-sm text-muted mt-1">
-            Track daily physical therapy, dressing changes, and log health metrics directly for clinical review.
+          <h1 className="serif-headline text-3xl sm:text-4xl text-charcoal">Daily Care & Symptom Check-In</h1>
+          <p className="text-sm text-muted mt-1 max-w-xl leading-relaxed">
+            Track daily physical therapy, dressing changes, and log health metrics directly for your attending physician.
           </p>
         </div>
 
@@ -120,32 +128,32 @@ export const DailyCare: React.FC = () => {
       </div>
 
       {checkinSuccess && (
-        <div className="p-4 bg-[#DCFCE7] border border-[#86EFAC]/50 rounded-2xl text-[#166534] flex items-center gap-3 text-xs font-bold animate-fade-in shadow-card">
-          <CheckCircle2 size={22} className="shrink-0 text-[#166534]" />
+        <div className="p-4 bg-[#D9F36A] border border-[#24252B]/15 rounded-2xl text-[#24252B] flex items-center gap-3 text-xs font-bold animate-fade-in shadow-sm">
+          <CheckCircle2 size={22} className="shrink-0 text-[#24252B]" />
           <span>
             Check-in recorded! Your reported symptoms and pain level have been logged into your continuity timeline.
           </span>
         </div>
       )}
 
-      {/* Progress Metric Card */}
-      <div className="content-card p-6 sm:p-7 bg-[#F8FAFC] border border-[#E2E8F0] shadow-card">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Editorial Progress Metric Card in Deep Ink Plum */}
+      <div className="rounded-[28px] p-6 sm:p-8 bg-[#30253D] text-[#FAF7F0] border border-white/10 shadow-hero">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">Today's Task Completion</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#D9F36A]">Today's Trajectory Completion</span>
             <div className="flex items-baseline gap-2 mt-1">
-              <span className="text-3xl font-black text-[#0F172A]">{completedCount} of {tasks.length}</span>
-              <span className="text-xs text-muted font-medium">activities completed</span>
+              <span className="serif-headline text-4xl font-bold text-[#FAF7F0]">{completedCount} of {tasks.length}</span>
+              <span className="text-xs text-[#FAF7F0]/70 font-medium">activities completed</span>
             </div>
           </div>
-          <div className="w-full sm:w-64">
-            <div className="w-full bg-[#E2E8F0] rounded-full h-2.5 overflow-hidden">
+          <div className="w-full sm:w-72">
+            <div className="w-full bg-white/15 rounded-full h-3 overflow-hidden p-0.5">
               <div 
-                className="bg-[#0F172A] h-2.5 rounded-full transition-all duration-500"
+                className="bg-[#D9F36A] h-2 rounded-full transition-all duration-500 shadow-sm"
                 style={{ width: `${progressPercent}%` }}
               ></div>
             </div>
-            <div className="text-right text-xs text-[#0F172A] font-bold mt-1.5">
+            <div className="text-right text-xs text-[#D9F36A] font-bold mt-2">
               {progressPercent}% Complete
             </div>
           </div>
@@ -153,10 +161,15 @@ export const DailyCare: React.FC = () => {
       </div>
 
       {/* Tasks List */}
-      <div className="content-card overflow-hidden">
-        <div className="p-5 border-b border-border-light flex items-center justify-between">
-          <h2 className="text-base font-extrabold text-charcoal">Prescribed Daily Tasks</h2>
-          <span className="text-xs text-muted">Tap to toggle done/pending</span>
+      <div className="editorial-card overflow-hidden">
+        <div className="p-5 sm:p-6 border-b border-border-editorial flex items-center justify-between">
+          <div>
+            <h2 className="serif-headline text-xl text-charcoal">Prescribed Daily Milestones</h2>
+            <p className="text-xs text-muted">Tap any item to mark completed or pending</p>
+          </div>
+          <span className="text-xs font-bold text-charcoal bg-[#FAF7F0] px-3 py-1 rounded-full border border-border-editorial">
+            {completedCount}/{tasks.length} Done
+          </span>
         </div>
 
         {loading ? (
@@ -164,25 +177,25 @@ export const DailyCare: React.FC = () => {
         ) : tasks.length === 0 ? (
           <div className="p-8 text-center text-muted">No care tasks scheduled for today.</div>
         ) : (
-          <div className="divide-y divide-border-light">
+          <div className="divide-y divide-border-editorial">
             {tasks.map(task => {
               const isCompleted = task.status === 'completed';
               return (
                 <div 
                   key={task.id} 
-                  className={`p-4 sm:p-5 flex items-center justify-between transition-colors hover:bg-pale-sage/30 cursor-pointer ${
-                    isCompleted ? 'bg-soft-mint/15' : ''
+                  className={`p-4 sm:p-5 flex items-center justify-between transition-colors hover:bg-[#FAF7F0] cursor-pointer ${
+                    isCompleted ? 'bg-[#F7FCE8]/40' : ''
                   }`}
                   onClick={() => toggleTask(task.id)}
                 >
                   <div className="flex items-center gap-4">
                     <div className="shrink-0">
                       {isCompleted ? (
-                        <div className="w-6 h-6 rounded-full bg-emerald text-white flex items-center justify-center shadow-sm">
+                        <div className="w-6 h-6 rounded-full bg-[#30253D] text-[#D9F36A] flex items-center justify-center shadow-xs">
                           <Check size={14} strokeWidth={3} />
                         </div>
                       ) : (
-                        <Circle className="text-muted-grey hover:text-emerald" size={24} />
+                        <Circle className="text-[#B9CDBB] hover:text-[#30253D]" size={24} />
                       )}
                     </div>
                     <div>
@@ -191,16 +204,14 @@ export const DailyCare: React.FC = () => {
                       }`}>
                         {task.title || (task as any).task_text}
                       </h3>
-                      <p className="text-xs text-emerald font-semibold mt-0.5">
+                      <p className="text-xs text-muted font-medium mt-0.5">
                         {(task.type || 'Activity').charAt(0).toUpperCase() + (task.type || 'Activity').slice(1)} • {task.time || 'Today'}
                       </p>
                     </div>
                   </div>
 
                   <span className={`text-xs px-3 py-1 rounded-full font-bold border ${
-                    isCompleted 
-                      ? 'bg-soft-mint text-forest border-emerald/20' 
-                      : 'bg-warm-cream text-muted border-border-light'
+                    isCompleted ? 'bg-[#D9F36A] text-[#24252B] border-[#D9F36A]' : 'bg-[#FAF7F0] text-muted border-border-editorial'
                   }`}>
                     {isCompleted ? 'Completed' : 'Pending'}
                   </span>
@@ -211,12 +222,10 @@ export const DailyCare: React.FC = () => {
         )}
       </div>
 
-      {/* Symptom Check-in Prompt Banner */}
-      <div className="content-card p-6 sm:p-7 bg-warm-cream border border-emerald/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Symptom Check-In Promo Callout in Warm Apricot */}
+      <div className="p-6 rounded-3xl bg-gradient-to-r from-[#FFF3EB] to-[#FAF7F0] border border-[#FFB78B]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h3 className="text-base font-extrabold text-charcoal flex items-center gap-2">
-            <HeartPulse size={18} className="text-emerald" /> Share Today's Recovery Observations
-          </h3>
+          <h4 className="serif-headline text-lg text-charcoal">Report Resting Pain & Mobility Changes</h4>
           <p className="text-xs text-muted mt-1 max-w-lg leading-relaxed">
             Regular symptom logging alerts your physician early to potential complications and eliminates guesswork during your next consultation.
           </p>
@@ -228,21 +237,21 @@ export const DailyCare: React.FC = () => {
 
       {/* Health Check-In Modal */}
       {showCheckinModal && (
-        <div className="fixed inset-0 bg-charcoal/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-border-medium rounded-[26px] p-6 sm:p-7 max-w-lg w-full space-y-6 shadow-2xl animate-fade-in relative">
-            <div className="flex justify-between items-center border-b border-border-light pb-4">
+        <div className="fixed inset-0 bg-[#30253D]/45 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-border-editorial rounded-[28px] p-6 sm:p-8 max-w-lg w-full space-y-6 shadow-2xl animate-fade-in relative">
+            <div className="flex justify-between items-center border-b border-border-editorial pb-4">
               <div className="flex items-center gap-2.5">
-                <div className="p-2.5 rounded-2xl bg-soft-mint text-forest">
+                <div className="p-2.5 rounded-2xl bg-[#D9F36A] text-[#24252B]">
                   <HeartPulse size={20} />
                 </div>
                 <div>
-                  <h3 className="text-lg font-extrabold text-charcoal">Daily Health Check-In</h3>
+                  <h3 className="serif-headline text-xl text-charcoal">Daily Health Check-In</h3>
                   <p className="text-xs text-muted">Directly synced to your physician follow-up note</p>
                 </div>
               </div>
               <button 
                 onClick={() => setShowCheckinModal(false)} 
-                className="text-muted hover:text-charcoal p-1.5 rounded-xl hover:bg-pale-sage"
+                className="text-muted hover:text-charcoal p-1.5 rounded-xl hover:bg-[#FAF7F0]"
               >
                 <X size={18} />
               </button>
@@ -266,13 +275,13 @@ export const DailyCare: React.FC = () => {
                   max="10" 
                   value={painLevel} 
                   onChange={(e) => setPainLevel(parseInt(e.target.value))}
-                  className="w-full accent-forest cursor-pointer h-2 bg-pale-sage rounded-lg"
+                  className="w-full accent-[#30253D] cursor-pointer h-2 bg-[#F0ECE1] rounded-lg"
                 />
 
                 <div className="flex justify-between text-[11px] text-muted mt-2 font-semibold">
-                  <span className="flex items-center gap-1 text-emerald"><Smile size={13} /> 0-3 (Mild)</span>
-                  <span className="flex items-center gap-1 text-amber-700"><Meh size={13} /> 4-6 (Moderate)</span>
-                  <span className="flex items-center gap-1 text-rose-700"><Frown size={13} /> 7-10 (Severe)</span>
+                  <span className="flex items-center gap-1 text-[#38420B]"><Smile size={13} /> 0-3 (Mild)</span>
+                  <span className="flex items-center gap-1 text-[#4A1D07]"><Meh size={13} /> 4-6 (Moderate)</span>
+                  <span className="flex items-center gap-1 text-[#8C1D18]"><Frown size={13} /> 7-10 (Severe)</span>
                 </div>
               </div>
 
@@ -286,35 +295,39 @@ export const DailyCare: React.FC = () => {
                     <button
                       key={chip}
                       type="button"
-                      onClick={() => handleChipClick(chip)}
-                      className="text-xs px-3 py-1 bg-warm-cream hover:bg-soft-mint text-charcoal rounded-full border border-border-light hover:border-emerald transition-all font-semibold"
+                      onClick={() => handleToggleSymptomChip(chip)}
+                      className={`text-[11px] px-3 py-1.5 rounded-full border transition-all ${
+                        symptoms.includes(chip)
+                          ? 'bg-[#30253D] text-[#FAF7F0] border-[#30253D] font-bold shadow-xs'
+                          : 'bg-[#FAF7F0] text-charcoal border-border-editorial hover:bg-[#F0ECE1]'
+                      }`}
                     >
-                      + {chip}
+                      {chip}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Notes textarea */}
+              {/* Specific Observations Input */}
               <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-charcoal block mb-2">
-                  Specific Observations or Questions for Care Team
+                <label className="text-xs font-bold uppercase tracking-wider text-charcoal block mb-1.5">
+                  Symptom Notes & Physician Remarks
                 </label>
-                <textarea
+                <textarea 
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="e.g. Incision dressing dry and intact. Able to walk unassisted for 15 minutes today."
                   rows={3}
-                  value={symptoms}
-                  onChange={(e) => setSymptoms(e.target.value)}
-                  placeholder="e.g. Incision dressing changed with no drainage; took evening medication on time..."
-                  className="w-full bg-warm-cream/50 border border-border-medium rounded-2xl p-3 text-xs focus:outline-none focus:border-emerald text-charcoal"
+                  className="w-full p-3 bg-[#FAF7F0] border border-border-editorial rounded-xl text-xs text-charcoal focus:outline-none focus:ring-2 focus:ring-[#30253D]"
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-3 border-t border-border-light">
+              <div className="flex justify-end gap-3 pt-3 border-t border-border-editorial">
                 <Button variant="ghost" type="button" onClick={() => setShowCheckinModal(false)}>
                   Cancel
                 </Button>
-                <Button type="submit" isLoading={submittingCheckin} icon={Send}>
-                  Submit Check-In
+                <Button type="submit" isLoading={checkinSubmitting} icon={Send}>
+                  Submit Daily Check-In
                 </Button>
               </div>
             </form>

@@ -45,7 +45,7 @@ export const Login: React.FC = () => {
     <div className="auth-container">
       <div className="auth-card animate-fade-in">
         <div className="text-center mb-6">
-          <div className="inline-flex p-3 rounded-2xl bg-forest-green text-soft-mint mb-3 shadow-md">
+          <div className="inline-flex p-3 rounded-2xl bg-[#0F172A] text-white mb-3 shadow-md">
             <Heart size={28} className="fill-current" />
           </div>
           <h1 className="text-2xl font-extrabold text-charcoal tracking-tight">CareBridge</h1>
@@ -53,21 +53,21 @@ export const Login: React.FC = () => {
         </div>
 
         {/* 1-Click Interactive Demo Personas for Judges */}
-        <div className="mb-6 p-4 rounded-2xl bg-pale-sage/60 border border-emerald/20">
-          <div className="flex items-center justify-between text-xs font-bold text-forest mb-3">
+        <div className="mb-6 p-4 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0]">
+          <div className="flex items-center justify-between text-xs font-bold text-[#0F172A] mb-3">
             <span className="flex items-center gap-1.5">
-              <Sparkles size={14} className="text-emerald" /> 1-Click Persona Access
+              <Sparkles size={14} className="text-[#0F172A]" /> 1-Click Persona Access
             </span>
-            <span className="text-[10px] uppercase tracking-wider text-emerald font-extrabold">Instant Login</span>
+            <span className="text-[10px] uppercase tracking-wider text-[#64748B] font-extrabold">Instant Login</span>
           </div>
 
           <div className="grid grid-cols-3 gap-2.5">
             <button
               type="button"
               onClick={() => handleDemoLogin('patient')}
-              className="p-3 bg-white hover:bg-soft-mint/40 rounded-xl border border-border-light hover:border-emerald transition-all flex flex-col items-center text-center group shadow-sm"
+              className="p-3 bg-white hover:bg-[#DCFCE7]/30 rounded-xl border border-[#E2E8F0] hover:border-[#86EFAC] transition-all flex flex-col items-center text-center group shadow-sm"
             >
-              <div className="p-1.5 rounded-lg bg-soft-mint text-forest group-hover:scale-110 transition-transform mb-1">
+              <div className="p-1.5 rounded-lg bg-[#DCFCE7] text-[#166534] group-hover:scale-110 transition-transform mb-1 border border-[#86EFAC]/40">
                 <User size={15} />
               </div>
               <span className="text-xs font-bold text-charcoal">Patient</span>
@@ -77,9 +77,9 @@ export const Login: React.FC = () => {
             <button
               type="button"
               onClick={() => handleDemoLogin('clinician')}
-              className="p-3 bg-white hover:bg-muted-lavender/40 rounded-xl border border-border-light hover:border-purple-300 transition-all flex flex-col items-center text-center group shadow-sm"
+              className="p-3 bg-white hover:bg-[#EDE9FE]/30 rounded-xl border border-[#E2E8F0] hover:border-[#C4B5FD] transition-all flex flex-col items-center text-center group shadow-sm"
             >
-              <div className="p-1.5 rounded-lg bg-muted-lavender text-purple-900 group-hover:scale-110 transition-transform mb-1">
+              <div className="p-1.5 rounded-lg bg-[#EDE9FE] text-[#5B21B6] group-hover:scale-110 transition-transform mb-1 border border-[#C4B5FD]/40">
                 <Stethoscope size={15} />
               </div>
               <span className="text-xs font-bold text-charcoal">Clinician</span>
@@ -89,9 +89,9 @@ export const Login: React.FC = () => {
             <button
               type="button"
               onClick={() => handleDemoLogin('caregiver')}
-              className="p-3 bg-white hover:bg-soft-peach/40 rounded-xl border border-border-light hover:border-orange-300 transition-all flex flex-col items-center text-center group shadow-sm"
+              className="p-3 bg-white hover:bg-[#FFEDD5]/30 rounded-xl border border-[#E2E8F0] hover:border-[#FDBA74] transition-all flex flex-col items-center text-center group shadow-sm"
             >
-              <div className="p-1.5 rounded-lg bg-soft-peach text-orange-950 group-hover:scale-110 transition-transform mb-1">
+              <div className="p-1.5 rounded-lg bg-[#FFEDD5] text-[#9A3412] group-hover:scale-110 transition-transform mb-1 border border-[#FDBA74]/40">
                 <HeartHandshake size={15} />
               </div>
               <span className="text-xs font-bold text-charcoal">Caregiver</span>

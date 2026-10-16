@@ -43,7 +43,7 @@ export const Register: React.FC = () => {
     <div className="auth-container py-12">
       <div className="auth-card animate-fade-in" style={{ maxWidth: '490px' }}>
         <div className="text-center mb-6">
-          <div className="inline-flex p-3 rounded-2xl bg-forest-green text-soft-mint mb-3 shadow-md">
+          <div className="inline-flex p-3 rounded-2xl bg-[#0F172A] text-white mb-3 shadow-md">
             <Heart size={28} className="fill-current" />
           </div>
           <h1 className="text-2xl font-extrabold tracking-tight text-charcoal">Create Your Patient Account</h1>
