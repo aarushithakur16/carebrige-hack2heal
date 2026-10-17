@@ -32,6 +32,9 @@ function App() {
           <Route path="daily-care" element={<DailyCare />} />
           <Route path="caregiver" element={<Caregiver />} />
           <Route path="clinician" element={<ClinicianSummary />} />
+          <Route path="overview" element={<Navigate to="/daily-care" replace />} />
+          <Route path="nutrition-wellness" element={<Navigate to="/daily-care" replace />} />
+          <Route path="sleep-activity" element={<Navigate to="/daily-care" replace />} />
         </Route>
       </Routes>
     </Router>

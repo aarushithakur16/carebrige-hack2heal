@@ -54,4 +54,30 @@ router.get('/tests', authenticateToken, authorizeRoles('PATIENT', 'CAREGIVER', '
   }
 });
 
+router.post('/appointments', authenticateToken, authorizeRoles('PATIENT', 'CAREGIVER', 'CLINICIAN'), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = (req as any).user?.id || 'p-1';
+    const { doctorName, department, date, time, location } = req.body;
+    
+    const result = await query(
+      'INSERT INTO appointments (patient_id, date, department, doctor_name, time, location, status) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+      [userId, date || 'Upcoming', department || 'General Medicine', doctorName || 'Dr. Sarah Jenkins', time || '10:00 AM', location || 'Building A, Room 302', 'scheduled']
+    );
+
+    const created = result.rows[0] || {
+      id: 'app-' + Date.now(),
+      doctorName: doctorName || 'Dr. Sarah Jenkins',
+      department: department || 'General Medicine',
+      date: date || 'Upcoming',
+      time: time || '10:00 AM',
+      location: location || 'Building A, Room 302',
+      status: 'scheduled'
+    };
+
+    return res.status(201).json(created);
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;

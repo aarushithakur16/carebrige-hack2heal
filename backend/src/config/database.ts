@@ -406,14 +406,14 @@ export const query = async (text: string, params: any[] = []): Promise<{ rows: a
     const newApp = {
       id: appId,
       patient_id: params[0],
-      date: params[1],
-      department: params[2],
-      doctor_name: 'Dr. Sarah Jenkins',
-      doctorName: 'Dr. Sarah Jenkins',
-      time: '10:00 AM',
-      location: 'Building A, Room 302',
-      status: params[3] || 'scheduled',
-      source_document_id: params[4]
+      date: params[1] || 'Upcoming',
+      department: params[2] || 'General Medicine',
+      doctor_name: params[3] || 'Dr. Sarah Jenkins',
+      doctorName: params[3] || 'Dr. Sarah Jenkins',
+      time: params[4] || '10:00 AM',
+      location: params[5] || 'Building A, Room 302',
+      status: params[6] || 'scheduled',
+      source_document_id: params[7] || null
     };
     memoryStore.appointments.push(newApp);
     return { rows: [newApp], rowCount: 1 };

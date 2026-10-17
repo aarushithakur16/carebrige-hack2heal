@@ -12,3 +12,10 @@ export const getTests = async (): Promise<Test[]> => {
   if (!user) return [];
   return await apiFetch(`/tests?patientId=${user.id}`);
 };
+
+export const createAppointment = async (data: Partial<Appointment>): Promise<Appointment> => {
+  return await apiFetch('/appointments', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+};
